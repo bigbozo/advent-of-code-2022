@@ -29,19 +29,8 @@ fn main() {
     }
 
     counts.sort();
-    counts.reverse();
-    let mut sum = 0;
 
-    let chunk = match counts.chunks(3).nth(0) {
-        Some(t) => t,
-        None => {
-            println!("Should have a chunk of 3");
-            exit(1);
-        }
-    };
-    for item in chunk {
-        sum += item;
-    }
+    let sum: i32 = counts.iter().rev().take(3).sum();
 
     println!("{}", sum);
 }
