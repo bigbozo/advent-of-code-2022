@@ -68,6 +68,14 @@ mod tests {
         assert_eq!(10000, counts[4]);
     }
     #[test]
+    fn max_count_works() {
+        assert_eq!(24000,max_count(vec![24000,10000,4000]));
+    }
+    #[test]
+    fn max_count_works_for_empty_vector() {
+        assert_eq!(0,max_count(vec![]));
+    }
+    #[test]
     fn max_sum_gets_returned() {
         let counts = sum_per_elf("input/day01-test.txt");
         assert_eq!(24000,max_count(counts));
