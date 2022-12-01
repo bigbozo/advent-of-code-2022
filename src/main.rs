@@ -1,3 +1,3 @@
 fn main() {
-    println!("Hello, world!");
+    println!("See https://adventofcode.com/2022");
 }
