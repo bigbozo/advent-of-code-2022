@@ -3,6 +3,7 @@ use std::process::exit;
 
 pub mod day01;
 pub mod day02;
+pub mod day03;
 
 pub fn read_file(filename: &str) -> String {
     match fs::read_to_string(filename) {
