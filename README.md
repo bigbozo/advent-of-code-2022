@@ -2,5 +2,7 @@
 
 Programm starten:
 
-    cargo run --bin day{xx}
+    # Arguments: [DAY]  the day for which to run the code
+
+    cargo run -- [DAY]
 
