@@ -14,3 +14,9 @@ pub fn read_file(filename: &str) -> String {
         }
     }
 }
+
+pub fn print_headline(title: &str) {
+    println!();
+    println!("{}", title);
+    println!("======");
+}

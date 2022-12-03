@@ -77,6 +77,21 @@ pub fn calculate_group_sums_for_file(filename: &str) -> u32 {
     sum
 }
 
+pub fn run() {
+    println!("The Rucksacks are wrong Packed!");
+
+    let score = priority_for_file("input/day03.txt");
+
+    println!("This is the priority score: {}", score);
+}
+
+pub fn run2() {
+    println!("Oh no! What's wrong with the badges???");
+
+    let score = calculate_group_sums_for_file("input/day03.txt");
+
+    println!("Corrected Badge-score: {}", score);
+}
 
 #[cfg(test)]
 mod tests {

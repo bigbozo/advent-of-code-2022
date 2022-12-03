@@ -54,6 +54,23 @@ pub fn calculate_best3(filename: &str) ->i32 {
     counts.iter().rev().take(3).sum()
 }
 
+pub fn run() {
+    println!("Hello Elves! Let's get started!");
+
+    let max_counts = calculate_best("input/day01-01.txt");
+
+    println!("The most calories carried are: {}", max_counts);
+}
+pub fn run2() {
+    println!("Find the best Three carriers!");
+
+    println!(
+        "The top three elves carry {} calories",
+        calculate_best3("input/day01-01.txt")
+    );
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;

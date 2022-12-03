@@ -86,6 +86,28 @@ pub fn calculate_score(result_map: HashMap<String, u32>, score_map: HashMap<Stri
     score
 }
 
+pub fn run() {
+    println!("Rock Paper Scissors!");
+
+    let score = calculate_score(
+        get_parsed_input("input/day02.txt"),
+        score_matrix('X', 'Y', 'Z'),
+    );
+
+    println!("Your totaled score: {}", score);
+}
+
+pub fn run2() {
+    println!("Let's be unconspicuous!");
+
+    let score = calculate_score(
+        get_parsed_input("input/day02.txt"),
+        score_matrix2('Z', 'Y', 'X'),
+    );
+
+    println!("You're adapted score is {}.", score);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -120,3 +142,4 @@ mod tests {
         ));
     }
 }
+
