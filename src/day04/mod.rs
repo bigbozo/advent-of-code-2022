@@ -7,36 +7,38 @@ struct Range {
 }
 
 impl Range {
+    pub fn new(range: &str) -> Range {
+        let mut split = range.split("-");
+        let min: i32 = split.next().unwrap().parse().unwrap();
+        let max: i32 = split.next().unwrap().parse().unwrap();
+
+        if min > max {
+            Range {
+                min: max,
+                max: min,
+            }
+        } else {
+            Range {
+                min,
+                max,
+            }
+        }
+    }
+
     pub fn contains(&self, b: &Range) -> bool {
         self.min <= b.min && self.max >= b.max
     }
-    pub fn overlap(&self,b: &Range) -> bool {
+    pub fn overlap(&self, b: &Range) -> bool {
         self.min <= b.max && self.max >= b.min
     }
 }
 
-fn get_range(range: &str) -> Range {
-    let mut split = range.split("-");
-    let min: i32 = split.next().unwrap().parse().unwrap();
-    let max: i32 = split.next().unwrap().parse().unwrap();
-
-    if min > max {
-        Range {
-            min: max,
-            max: min,
-        }
-    } else {
-        Range {
-            min,
-            max,
-        }
-    }
-}
 
 fn get_ranges(ranges: &str) -> (Range, Range) {
     let mut split = ranges.split(",");
-    let left = get_range(split.next().unwrap());
-    let right = get_range(split.next().unwrap());
+
+    let left = Range::new(split.next().unwrap());
+    let right = Range::new(split.next().unwrap());
 
     (left, right)
 }
@@ -44,15 +46,15 @@ fn get_ranges(ranges: &str) -> (Range, Range) {
 pub fn calculate(filename: &str) -> i32 {
     let input = read_file(filename);
 
-    input.split("\n").map(|line| {
-        let ranges = get_ranges(line);
-        if ranges.0.contains(&ranges.1) {
+    input.lines().map(|line| {
+        let (left, right) = get_ranges(line);
+        if left.contains(&right) {
             return 1;
         }
-        if ranges.1.contains(&ranges.0) {
+        if right.contains(&left) {
             return 1;
         }
-        return 0;
+        0
     }).sum()
 }
 
@@ -60,11 +62,11 @@ pub fn calculate2(filename: &str) -> i32 {
     let input = read_file(filename);
 
     input.split("\n").map(|line| {
-        let ranges = get_ranges(line);
-        if ranges.0.overlap(&ranges.1) {
+        let (left, right) = get_ranges(line);
+        if left.overlap(&right) {
             return 1;
         }
-        return 0;
+        0
     }).sum()
 }
 
@@ -73,12 +75,13 @@ pub fn calculate2(filename: &str) -> i32 {
 pub fn run() {
     println!("Camp Cleanup");
     let count = calculate("input/day04.txt");
-    println!("There are {} doubled ranges",count);
+    println!("There are {} doubled ranges", count);
 }
+
 pub fn run2() {
     println!("This wasn't extensive enough!");
     let count = calculate2("input/day04.txt");
-    println!("There are {} overlapping ranges",count);
+    println!("There are {} overlapping ranges", count);
 }
 
 #[cfg(test)]
@@ -87,8 +90,8 @@ mod tests {
 
     #[test]
     fn range_is_correct_parsed() {
-        assert_eq!(Range { min: 2, max: 4 }, get_range("2-4"));
-        assert_eq!(Range { min: 6, max: 8 }, get_range("8-6"));
+        assert_eq!(Range { min: 2, max: 4 }, Range::new("2-4"));
+        assert_eq!(Range { min: 6, max: 8 }, Range::new("8-6"));
     }
 
     #[test]
@@ -117,6 +120,6 @@ mod tests {
 
     #[test]
     fn test_data_produced_correct_result_for_part_two() {
-        assert_eq!(4,calculate2("input/day04-test.txt"));
+        assert_eq!(4, calculate2("input/day04-test.txt"));
     }
 }
