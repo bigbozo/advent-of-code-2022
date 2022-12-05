@@ -20,9 +20,6 @@ struct Instruction {
 
 
 impl Stacks {
-    pub fn len(&self) -> usize {
-        self.items.len()
-    }
     pub fn add(&mut self, stacks: Stacks) {
         for i in 0..stacks.items.len() {
             for char in &stacks.items[i].items {
@@ -31,9 +28,6 @@ impl Stacks {
         }
     }
 
-    pub fn get(&self, id: usize) -> &Stack {
-        &self.items[id]
-    }
 
     pub fn mv(&mut self, from: usize, to: usize) {
         let from = self.items[from].items.pop().unwrap().to_owned();
@@ -41,12 +35,32 @@ impl Stacks {
         to.items.push(from);
     }
 
+    pub fn mv_stack(&mut self, from: usize, to: usize, stack_size: usize) {
+        let mut swap: Vec<char> = Vec::new();
+
+        for _ in 0..stack_size {
+            swap.push(self.items[from].items.pop().unwrap().to_owned());
+        }
+
+        for _ in 0..stack_size {
+            self.items[to].items.push(swap.pop().unwrap());
+        }
+    }
+
+
     pub fn perform_instructions(&mut self, instructions: String) {
         for instruction in instructions.lines() {
             let instruction = parse_instruction(instruction);
             for _i in 0..instruction.count {
                 self.mv(instruction.from - 1, instruction.to - 1);
             }
+        }
+    }
+
+    pub fn perform_instructions9001(&mut self, instructions: String) {
+        for instruction in instructions.lines() {
+            let instruction = parse_instruction(instruction);
+            self.mv_stack(instruction.from - 1, instruction.to - 1, instruction.count);
         }
     }
 
@@ -116,10 +130,19 @@ fn parse_instruction(instruction: &str) -> Instruction {
 }
 
 pub fn run() {
+    println!("Supply Stacks");
     let (mut stacks, instructions) = parse_input("input/day05.txt");
     stacks.perform_instructions(instructions);
     let answer: String = stacks.get_tops().iter().collect();
-    println!("{}",answer);
+    println!("Final Supply Stack top crates: {}", answer);
+}
+
+pub fn run2() {
+    println!("Oh, it's a 9001");
+    let (mut stacks, instructions) = parse_input("input/day05.txt");
+    stacks.perform_instructions9001(instructions);
+    let answer: String = stacks.get_tops().iter().collect();
+    println!("Then the answer is {}", answer);
 }
 
 
@@ -181,6 +204,19 @@ mod test {
     fn top_crates_are_returned() {
         let (mut stacks, instructions) = parse_input("input/day05-test.txt");
         stacks.perform_instructions(instructions);
-        assert_eq!(vec!['C','M','Z'],stacks.get_tops());
+        assert_eq!(vec!['C', 'M', 'Z'], stacks.get_tops());
+    }
+
+    #[test]
+    fn moving_stacks() {
+        let (mut stacks, _instructions) = parse_input("input/day05-test.txt");
+        stacks.mv_stack(1, 0, 1);
+        assert_eq!(Stack { items: vec!['Z', 'N', 'D'] }, stacks.items[0]);
+        assert_eq!(Stack { items: vec!['M', 'C'] }, stacks.items[1]);
+        assert_eq!(Stack { items: vec!['P'] }, stacks.items[2]);
+        stacks.mv_stack(0, 2, 3);
+        assert_eq!(Stack { items: vec![] }, stacks.items[0]);
+        assert_eq!(Stack { items: vec!['M', 'C'] }, stacks.items[1]);
+        assert_eq!(Stack { items: vec!['P', 'Z', 'N', 'D'] }, stacks.items[2]);
     }
 }
