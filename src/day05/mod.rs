@@ -28,10 +28,6 @@ impl Stacks {
         }
     }
 
-    pub fn len(&self) -> usize {
-       self.items.len()
-    }
-
 
     pub fn mv(&mut self, from: usize, to: usize) {
         let from = self.items[from].items.pop().unwrap().to_owned();
@@ -157,7 +153,7 @@ mod test {
     #[test]
     fn parse_to_stacks_work() {
         let stacks = parse_to_stacks("    [D]    ");
-        assert_eq!(3, stacks.len());
+        assert_eq!(3, stacks.items.len());
         assert_eq!(Stack { items: vec![] }, stacks.items[2]);
         assert_eq!(Stack { items: vec!['D'] }, stacks.items[1]);
         assert_eq!(Stack { items: vec![] }, stacks.items[0]);

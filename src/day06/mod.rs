@@ -31,10 +31,10 @@ pub fn parse_line_with_packet_size(input: &str, packetsize: usize) -> Option<usi
 
 pub fn run() {
     println!("Tuning Trouble");
-    println!("Unique stream starts at: {}", parse_line(&read_file("input/day06.txt")).unwrap());
+    println!("Starting packet marker starts at: {}", parse_line(&read_file("input/day06.txt")).unwrap());
 }
 pub fn run2() {
-    println!("Tuning Trouble");
+    println!("... and for the messaage: ");
     println!("Message stream starts at: {}", parse_line_with_packet_size(&read_file("input/day06.txt"),14).unwrap());
 }
 

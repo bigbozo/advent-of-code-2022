@@ -15,7 +15,7 @@ fn main() {
 
 fn run_day(day: Option<u32>) {
     match day {
-        None => for i in 1..6 {
+        None => for i in 1..7 {
             run_day(Some(i));
         },
         Some(1) => {
