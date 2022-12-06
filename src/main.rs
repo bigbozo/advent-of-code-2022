@@ -46,6 +46,7 @@ fn run_day(day: Option<u32>) {
         Some(6)=> {
             print_headline("Day 06");
             adventofcode::day06::run();
+            adventofcode::day06::run2();
         }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
