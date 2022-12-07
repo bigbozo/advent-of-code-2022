@@ -1,3 +1,5 @@
+extern crate core;
+
 use std::fs;
 use std::process::exit;
 
@@ -7,6 +9,7 @@ pub mod day03;
 pub mod day04;
 pub mod day05;
 pub mod day06;
+pub mod day07;
 
 pub fn read_file(filename: &str) -> String {
     match fs::read_to_string(filename) {
