@@ -1,5 +1,5 @@
-use clap::Parser;
 use adventofcode::print_headline;
+use clap::Parser;
 
 #[derive(Parser)]
 struct Cli {
@@ -15,9 +15,11 @@ fn main() {
 
 fn run_day(day: Option<u32>) {
     match day {
-        None => for i in 1..9 {
-            run_day(Some(i));
-        },
+        None => {
+            for i in 1..9 {
+                run_day(Some(i));
+            }
+        }
         Some(1) => {
             print_headline("Day 01");
             adventofcode::day01::run();
@@ -38,22 +40,22 @@ fn run_day(day: Option<u32>) {
             adventofcode::day04::run();
             adventofcode::day04::run2();
         }
-        Some(5)=> {
+        Some(5) => {
             print_headline("Day 05");
             adventofcode::day05::run();
             adventofcode::day05::run2();
         }
-        Some(6)=> {
+        Some(6) => {
             print_headline("Day 06");
             adventofcode::day06::run();
             adventofcode::day06::run2();
         }
-        Some(7)=> {
+        Some(7) => {
             print_headline("Day 07");
             adventofcode::day07::run();
             adventofcode::day07::run2();
         }
-        Some(8)=> {
+        Some(8) => {
             print_headline("Day 08");
             adventofcode::day08::run();
             adventofcode::day08::run2();
@@ -61,4 +63,3 @@ fn run_day(day: Option<u32>) {
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
 }
-

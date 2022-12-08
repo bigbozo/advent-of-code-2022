@@ -16,7 +16,7 @@ pub fn read_file(filename: &str) -> String {
     match fs::read_to_string(filename) {
         Ok(data) => data,
         Err(_) => {
-            println!("Couln't read file {}",filename);
+            println!("Couln't read file {}", filename);
             exit(1);
         }
     }
