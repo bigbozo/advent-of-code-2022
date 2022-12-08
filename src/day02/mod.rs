@@ -1,12 +1,15 @@
-use std::collections::HashMap;
 use super::read_file;
+use std::collections::HashMap;
 
 pub fn get_parsed_input(filename: &str) -> HashMap<String, u32> {
     let mut hash_map = HashMap::new();
     let input: String = read_file(filename);
     for line in input.lines() {
         if !line.is_empty() {
-            hash_map.entry(line.to_owned()).and_modify(|count| *count += 1).or_insert(1);
+            hash_map
+                .entry(line.to_owned())
+                .and_modify(|count| *count += 1)
+                .or_insert(1);
         }
     }
     hash_map
@@ -128,18 +131,23 @@ mod tests {
 
     #[test]
     fn total_score_is_correct() {
-        assert_eq!(15, calculate_score(
-            get_parsed_input("input/day02-test.txt"),
-            score_matrix('X', 'Y', 'Z'),
-        ));
+        assert_eq!(
+            15,
+            calculate_score(
+                get_parsed_input("input/day02-test.txt"),
+                score_matrix('X', 'Y', 'Z'),
+            )
+        );
     }
 
     #[test]
     fn total_score_is_correct_for_b() {
-        assert_eq!(12, calculate_score(
-            get_parsed_input("input/day02-test.txt"),
-            score_matrix2('Z', 'Y', 'X'),
-        ));
+        assert_eq!(
+            12,
+            calculate_score(
+                get_parsed_input("input/day02-test.txt"),
+                score_matrix2('Z', 'Y', 'X'),
+            )
+        );
     }
 }
-

@@ -8,20 +8,14 @@ struct Range {
 
 impl Range {
     pub fn new(range: &str) -> Range {
-        let mut split = range.split("-");
+        let mut split = range.split('-');
         let min: i32 = split.next().unwrap().parse().unwrap();
         let max: i32 = split.next().unwrap().parse().unwrap();
 
         if min > max {
-            Range {
-                min: max,
-                max: min,
-            }
+            Range { min: max, max: min }
         } else {
-            Range {
-                min,
-                max,
-            }
+            Range { min, max }
         }
     }
 
@@ -33,9 +27,8 @@ impl Range {
     }
 }
 
-
 fn get_ranges(ranges: &str) -> (Range, Range) {
-    let mut split = ranges.split(",");
+    let mut split = ranges.split(',');
 
     let left = Range::new(split.next().unwrap());
     let right = Range::new(split.next().unwrap());
@@ -46,31 +39,35 @@ fn get_ranges(ranges: &str) -> (Range, Range) {
 pub fn calculate(filename: &str) -> i32 {
     let input = read_file(filename);
 
-    input.lines().map(|line| {
-        let (left, right) = get_ranges(line);
-        if left.contains(&right) {
-            return 1;
-        }
-        if right.contains(&left) {
-            return 1;
-        }
-        0
-    }).sum()
+    input
+        .lines()
+        .map(|line| {
+            let (left, right) = get_ranges(line);
+            if left.contains(&right) {
+                return 1;
+            }
+            if right.contains(&left) {
+                return 1;
+            }
+            0
+        })
+        .sum()
 }
 
 pub fn calculate2(filename: &str) -> i32 {
     let input = read_file(filename);
 
-    input.split("\n").map(|line| {
-        let (left, right) = get_ranges(line);
-        if left.overlap(&right) {
-            return 1;
-        }
-        0
-    }).sum()
+    input
+        .split('\n')
+        .map(|line| {
+            let (left, right) = get_ranges(line);
+            if left.overlap(&right) {
+                return 1;
+            }
+            0
+        })
+        .sum()
 }
-
-
 
 pub fn run() {
     println!("Camp Cleanup");
@@ -96,7 +93,10 @@ mod tests {
 
     #[test]
     fn line_is_correct_parsed() {
-        assert_eq!((Range { min: 2, max: 4 }, Range { min: 6, max: 8 }), get_ranges("2-4,6-8"));
+        assert_eq!(
+            (Range { min: 2, max: 4 }, Range { min: 6, max: 8 }),
+            get_ranges("2-4,6-8")
+        );
     }
 
     #[test]

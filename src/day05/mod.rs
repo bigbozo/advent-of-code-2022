@@ -18,7 +18,6 @@ struct Instruction {
     count: usize,
 }
 
-
 impl Stacks {
     pub fn add(&mut self, stacks: Stacks) {
         for i in 0..stacks.items.len() {
@@ -27,7 +26,6 @@ impl Stacks {
             }
         }
     }
-
 
     pub fn mv(&mut self, from: usize, to: usize) {
         let from = self.items[from].items.pop().unwrap().to_owned();
@@ -46,7 +44,6 @@ impl Stacks {
             self.items[to].items.push(swap.pop().unwrap());
         }
     }
-
 
     pub fn perform_instructions(&mut self, instructions: String) {
         for instruction in instructions.lines() {
@@ -73,25 +70,20 @@ impl Stacks {
     }
 }
 
-
 fn parse_to_stacks(input: &str) -> Stacks {
     let mut stacks: Vec<Stack> = Vec::new();
 
     for cols in input.chars().collect::<Vec<char>>().chunks(4) {
         if cols[1] != ' ' {
             stacks.push(Stack {
-                items: vec![cols[1]]
+                items: vec![cols[1]],
             });
         } else {
-            stacks.push(Stack {
-                items: vec![]
-            })
+            stacks.push(Stack { items: vec![] })
         }
     }
 
-    Stacks {
-        items: stacks
-    }
+    Stacks { items: stacks }
 }
 
 fn parse_input(filename: &str) -> (Stacks, String) {
@@ -102,12 +94,10 @@ fn parse_input(filename: &str) -> (Stacks, String) {
     let stack_input = split.next().unwrap();
     let instructions = split.next().unwrap().to_owned();
 
-
     let mut stack_input = stack_input.lines().rev();
 
     let _counter_line = stack_input.next().to_owned();
     let first_line = stack_input.next().to_owned();
-
 
     let mut stacks = parse_to_stacks(first_line.unwrap());
     for line in stack_input {
@@ -145,7 +135,6 @@ pub fn run2() {
     println!("Then the answer is {}", answer);
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -166,27 +155,54 @@ mod test {
         let stacks3 = parse_to_stacks("[Z] [M] [P] ");
         stacks1.add(stacks2);
         stacks1.add(stacks3);
-        assert_eq!(Stack { items: vec!['D', 'C', 'M'] }, stacks1.items[1]);
+        assert_eq!(
+            Stack {
+                items: vec!['D', 'C', 'M']
+            },
+            stacks1.items[1]
+        );
     }
 
     #[test]
     fn parsing_input() {
         let (stacks, _instructions) = parse_input("input/day05-test.txt");
-        assert_eq!(Stack { items: vec!['M', 'C', 'D'] }, stacks.items[1]);
+        assert_eq!(
+            Stack {
+                items: vec!['M', 'C', 'D']
+            },
+            stacks.items[1]
+        );
     }
 
     #[test]
     fn move_from_stack_to_stack() {
         let (mut stacks, _instructions) = parse_input("input/day05-test.txt");
         stacks.mv(1, 0);
-        assert_eq!(Stack { items: vec!['Z', 'N', 'D'] }, stacks.items[0]);
-        assert_eq!(Stack { items: vec!['M', 'C'] }, stacks.items[1]);
+        assert_eq!(
+            Stack {
+                items: vec!['Z', 'N', 'D']
+            },
+            stacks.items[0]
+        );
+        assert_eq!(
+            Stack {
+                items: vec!['M', 'C']
+            },
+            stacks.items[1]
+        );
     }
 
     #[test]
     fn instruction_is_correctly_parsed() {
         let instruction = "move 3 from 2 to 1";
-        assert_eq!(Instruction { from: 2, to: 1, count: 3 }, parse_instruction(instruction));
+        assert_eq!(
+            Instruction {
+                from: 2,
+                to: 1,
+                count: 3
+            },
+            parse_instruction(instruction)
+        );
     }
 
     #[test]
@@ -197,7 +213,12 @@ mod test {
 
         assert_eq!(Stack { items: vec!['C'] }, stacks.items[0]);
         assert_eq!(Stack { items: vec!['M'] }, stacks.items[1]);
-        assert_eq!(Stack { items: vec!['P', 'D', 'N', 'Z'] }, stacks.items[2]);
+        assert_eq!(
+            Stack {
+                items: vec!['P', 'D', 'N', 'Z']
+            },
+            stacks.items[2]
+        );
     }
 
     #[test]
@@ -211,12 +232,32 @@ mod test {
     fn moving_stacks() {
         let (mut stacks, _instructions) = parse_input("input/day05-test.txt");
         stacks.mv_stack(1, 0, 1);
-        assert_eq!(Stack { items: vec!['Z', 'N', 'D'] }, stacks.items[0]);
-        assert_eq!(Stack { items: vec!['M', 'C'] }, stacks.items[1]);
+        assert_eq!(
+            Stack {
+                items: vec!['Z', 'N', 'D']
+            },
+            stacks.items[0]
+        );
+        assert_eq!(
+            Stack {
+                items: vec!['M', 'C']
+            },
+            stacks.items[1]
+        );
         assert_eq!(Stack { items: vec!['P'] }, stacks.items[2]);
         stacks.mv_stack(0, 2, 3);
         assert_eq!(Stack { items: vec![] }, stacks.items[0]);
-        assert_eq!(Stack { items: vec!['M', 'C'] }, stacks.items[1]);
-        assert_eq!(Stack { items: vec!['P', 'Z', 'N', 'D'] }, stacks.items[2]);
+        assert_eq!(
+            Stack {
+                items: vec!['M', 'C']
+            },
+            stacks.items[1]
+        );
+        assert_eq!(
+            Stack {
+                items: vec!['P', 'Z', 'N', 'D']
+            },
+            stacks.items[2]
+        );
     }
 }

@@ -2,7 +2,7 @@ use std::cmp::{max};
 use crate::day08::Direction::{North, South, East, West};
 use crate::read_file;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Tree {
     north: bool,
     east: bool,
@@ -30,7 +30,7 @@ impl Tree {
         }
     }
     fn is_visible(&self) -> bool {
-        return self.west || self.east || self.north || self.south;
+        self.west || self.east || self.north || self.south
     }
 }
 
@@ -106,7 +106,7 @@ pub fn count_visibles(forest: &mut Forest) -> i32 {
     let mut count = 0;
     for trees in forest {
         for tree in trees {
-            count += if tree.is_visible() { 1 } else { 0 };
+            count += i32::from(tree.is_visible());
         }
     }
 
@@ -180,8 +180,8 @@ pub fn run() {
 }
 
 pub fn run2() {
-    let mut forest = input_forest("input/day08.txt");
-    let score = max_scenic_score(&mut forest);
+    let forest = input_forest("input/day08.txt");
+    let score = max_scenic_score(&forest);
     println!("The highest scenic scoring tree scores {}", score);
 }
 
@@ -216,6 +216,6 @@ mod test {
 
         assert_eq!(4, calc_scenic_score(&mut forest, 1, 2));
         assert_eq!(8, calc_scenic_score(&mut forest, 3, 2));
-        assert_eq!(8, max_scenic_score(&mut forest));
+        assert_eq!(8, max_scenic_score(&forest));
     }
 }

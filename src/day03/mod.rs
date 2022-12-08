@@ -12,25 +12,26 @@ fn priority(a: char) -> u32 {
 }
 
 fn get_common_char(items: &str) -> Option<char> {
-
     let count = items.chars().count() / 2;
     let mut letters: HashMap<char, u32> = HashMap::new();
     // Build a hashmap from the first half of letter
     for letter in items[..count].chars() {
-        letters.entry(letter).and_modify(|count| *count += 1).or_insert(1);
+        letters
+            .entry(letter)
+            .and_modify(|count| *count += 1)
+            .or_insert(1);
     }
     // check for letters already used
-    for letter in items[count..].chars() {
-        if letters.contains_key(&letter) {
-            return Some(letter);
-        }
-    }
-
-    None
+    items[count..]
+        .chars()
+        .find(|&letter| letters.contains_key(&letter))
 }
 
 pub fn priority_sum(input: String) -> u32 {
-    input.lines().map(|line| priority(get_common_char(line).unwrap())).sum()
+    input
+        .lines()
+        .map(|line| priority(get_common_char(line).unwrap()))
+        .sum()
 }
 
 pub fn priority_for_file(filename: &str) -> u32 {
@@ -48,7 +49,9 @@ fn unique_items(items: &str) -> HashMap<char, u32> {
 
 fn add_items(mut map1: HashMap<char, u32>, map2: HashMap<char, u32>) -> HashMap<char, u32> {
     for letter in map2.keys() {
-        map1.entry(*letter).and_modify(|count| *count += 1).or_insert(1);
+        map1.entry(*letter)
+            .and_modify(|count| *count += 1)
+            .or_insert(1);
     }
 
     map1
@@ -62,8 +65,9 @@ pub fn find_valid_badge(backpacks: &[&str]) -> Option<char> {
     items = add_items(items, items2);
     items = add_items(items, items3);
 
-
-    items.iter().find_map(|(key, &val)| if val == 3 { Some(*key) } else { None })
+    items
+        .iter()
+        .find_map(|(key, &val)| if val == 3 { Some(*key) } else { None })
 }
 
 pub fn calculate_group_sums_for_file(filename: &str) -> u32 {
@@ -72,7 +76,7 @@ pub fn calculate_group_sums_for_file(filename: &str) -> u32 {
 
     for item in input.lines().collect::<Vec<&str>>().chunks(3) {
         sum += priority(find_valid_badge(item).unwrap())
-    };
+    }
 
     sum
 }
@@ -108,7 +112,10 @@ mod tests {
     #[test]
     fn finds_common_items() {
         assert_eq!(Some('p'), get_common_char("vJrwpWtwJgWrhcsFMMfFFhFp"));
-        assert_eq!(Some('L'), get_common_char("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"));
+        assert_eq!(
+            Some('L'),
+            get_common_char("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL")
+        );
         assert_eq!(Some('P'), get_common_char("PmmdzqPrVvPwwTWBwg"));
         assert_eq!(Some('v'), get_common_char("wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn"));
         assert_eq!(Some('t'), get_common_char("ttgJtRGJQctTZtZT"));
@@ -129,8 +136,22 @@ mod tests {
     #[test]
     fn finds_valid_badges() {
         assert_eq!(Some('c'), find_valid_badge(&["abc", "bcd", "cde"]));
-        assert_eq!(Some('r'), find_valid_badge(&["vJrwpWtwJgWrhcsFMMfFFhFp", "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL", "PmmdzqPrVvPwwTWBwg"]));
-        assert_eq!(Some('Z'), find_valid_badge(&["wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn", "ttgJtRGJQctTZtZT", "CrZsJsPPZsGzwwsLwLmpwMDw"]));
+        assert_eq!(
+            Some('r'),
+            find_valid_badge(&[
+                "vJrwpWtwJgWrhcsFMMfFFhFp",
+                "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+                "PmmdzqPrVvPwwTWBwg"
+            ])
+        );
+        assert_eq!(
+            Some('Z'),
+            find_valid_badge(&[
+                "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+                "ttgJtRGJQctTZtZT",
+                "CrZsJsPPZsGzwwsLwLmpwMDw"
+            ])
+        );
     }
 
     #[test]
