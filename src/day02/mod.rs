@@ -1,5 +1,6 @@
 use super::read_file;
 use std::collections::HashMap;
+use ansi_term::Colour::Yellow;
 
 pub fn get_parsed_input(filename: &str) -> HashMap<String, u32> {
     let mut hash_map = HashMap::new();
@@ -90,14 +91,13 @@ pub fn calculate_score(result_map: HashMap<String, u32>, score_map: HashMap<Stri
 }
 
 pub fn run() {
-    println!("Rock Paper Scissors!");
-
+    println!("whose tent gets to be closest to the snack storage");
     let score = calculate_score(
         get_parsed_input("input/day02.txt"),
         score_matrix('X', 'Y', 'Z'),
     );
 
-    println!("Your totaled score: {}", score);
+    println!("Your totaled score: {}", Yellow.bold().paint(format!("{}",score)));
 }
 
 pub fn run2() {
@@ -108,7 +108,7 @@ pub fn run2() {
         score_matrix2('Z', 'Y', 'X'),
     );
 
-    println!("You're adapted score is {}.", score);
+    println!("You're adapted score is {}.", Yellow.bold().paint(format!("{}",score)));
 }
 
 #[cfg(test)]

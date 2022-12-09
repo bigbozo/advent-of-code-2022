@@ -1,6 +1,7 @@
 use crate::read_file;
 use std::collections::HashMap;
 use std::process::exit;
+use ansi_term::Colour::Yellow;
 
 #[derive(PartialEq)]
 enum LineMode {
@@ -72,7 +73,8 @@ pub fn run() {
         .into_values()
         .filter(|value| *value < 100_000)
         .collect();
-    println!("Sum of below 100_000 dirs is: {:?}", v.iter().sum::<u32>());
+    let answer = v.iter().sum::<u32>();
+    println!("Sum of below 100_000 dirs is: {}", Yellow.bold().paint(format!("{}",answer)));
 }
 
 pub fn run2() {
@@ -89,7 +91,7 @@ pub fn run2() {
             min_val = *val;
         }
     }
-    println!("We should delete {} with size: {}", target_key, min_val);
+    println!("We should delete {} with size: {}", Yellow.bold().paint(format!("{}",target_key)), Yellow.bold().paint(format!("{}",min_val)));
 }
 
 #[cfg(test)]

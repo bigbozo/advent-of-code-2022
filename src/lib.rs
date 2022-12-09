@@ -2,6 +2,7 @@ extern crate core;
 
 use std::fs;
 use std::process::exit;
+use ansi_term::Colour::{Yellow};
 
 pub mod day01;
 pub mod day02;
@@ -25,6 +26,7 @@ pub fn read_file(filename: &str) -> String {
 
 pub fn print_headline(title: &str) {
     println!();
-    println!("{}", title);
-    println!("======");
+    println!("{}", Yellow.bold().paint(title));
+    let line = title.chars().into_iter().map(|_| "=").collect::<String>();
+    println!("{}",Yellow.bold().paint(line));
 }

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::process::exit;
+use ansi_term::Colour::Yellow;
 use crate::read_file;
 use crate::day09::Direction::{D, L, R, U};
 
@@ -104,7 +105,7 @@ fn walk10(input: String) -> usize {
     let commands: Vec<Command> = parse_input(input);
 
     let mut positions: HashMap<String, bool> = HashMap::new();
-    let mut rope = [Point { x: 0, y: 0}; 10];
+    let mut rope = [Point { x: 0, y: 0 }; 10];
 
 
     positions.entry(rope[9].to_string()).or_insert(true);
@@ -118,7 +119,7 @@ fn walk10(input: String) -> usize {
                 L => rope[0].x -= 1
             }
             for i in 1..10 {
-                rope[i].chase(rope[i-1]);
+                rope[i].chase(rope[i - 1]);
             }
             positions.entry(rope[9].to_string()).or_insert(true);
         }
@@ -131,16 +132,14 @@ pub fn run() {
     let input = read_file("input/day09.txt");
     let count = walk(input);
 
-    println!("The Tail visits {} positions.",count);
-
+    println!("The Tail visits {} positions.", Yellow.bold().paint(format!("{}", count)));
 }
 
 pub fn run2() {
     let input = read_file("input/day09.txt");
     let count = walk10(input);
 
-    println!("The 10-Foot-Rope-Tail visits {} positions.",count);
-
+    println!("The 10-Foot-Rope-Tail visits {} positions.", Yellow.bold().paint(format!("{}", count)));
 }
 
 #[cfg(test)]
@@ -162,6 +161,7 @@ mod test {
         let input = read_file("input/day09-test.txt");
         assert_eq!(13, walk(input));
     }
+
     #[test]
     pub fn walker2_test() {
         let input = read_file("input/day09-test.txt");
@@ -177,5 +177,4 @@ L 25
 U 20";
         assert_eq!(36, walk10(input.to_string()));
     }
-
 }

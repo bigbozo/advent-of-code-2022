@@ -1,4 +1,5 @@
 use std::cmp::{max};
+use ansi_term::Colour::Yellow;
 use crate::day08::Direction::{North, South, East, West};
 use crate::read_file;
 
@@ -176,13 +177,13 @@ pub fn run() {
     let mut forest = input_forest("input/day08.txt");
 
     let count = count_visibles(&mut forest);
-    println!("There are {} trees visible", count);
+    println!("There are {} trees visible", Yellow.bold().paint(format!("{}", count)));
 }
 
 pub fn run2() {
     let forest = input_forest("input/day08.txt");
     let score = max_scenic_score(&forest);
-    println!("The highest scenic scoring tree scores {}", score);
+    println!("The highest scenic scoring tree scores {}", Yellow.bold().paint(format!("{}",score)));
 }
 
 #[cfg(test)]

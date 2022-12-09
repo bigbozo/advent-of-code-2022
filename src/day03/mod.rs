@@ -1,5 +1,6 @@
 use super::read_file;
 use std::collections::HashMap;
+use ansi_term::Colour::Yellow;
 
 fn priority(a: char) -> u32 {
     let priority = a as u32;
@@ -86,7 +87,7 @@ pub fn run() {
 
     let score = priority_for_file("input/day03.txt");
 
-    println!("This is the priority score: {}", score);
+    println!("This is the priority score: {}", Yellow.bold().paint(format!("{}",score)));
 }
 
 pub fn run2() {
@@ -94,7 +95,7 @@ pub fn run2() {
 
     let score = calculate_group_sums_for_file("input/day03.txt");
 
-    println!("Corrected Badge-score: {}", score);
+    println!("Corrected Badge-score: {}", Yellow.bold().paint(format!("{}",score)));
 }
 
 #[cfg(test)]

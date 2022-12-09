@@ -1,3 +1,4 @@
+use ansi_term::Colour::Yellow;
 use crate::read_file;
 use regex::Regex;
 
@@ -124,7 +125,7 @@ pub fn run() {
     let (mut stacks, instructions) = parse_input("input/day05.txt");
     stacks.perform_instructions(instructions);
     let answer: String = stacks.get_tops().iter().collect();
-    println!("Final Supply Stack top crates: {}", answer);
+    println!("Final Supply Stack top crates: {}", Yellow.bold().paint(format!("{}",answer)));
 }
 
 pub fn run2() {
@@ -132,7 +133,7 @@ pub fn run2() {
     let (mut stacks, instructions) = parse_input("input/day05.txt");
     stacks.perform_instructions9001(instructions);
     let answer: String = stacks.get_tops().iter().collect();
-    println!("Then the answer is {}", answer);
+    println!("Then the answer is {}", Yellow.bold().paint(format!("{}",answer)));
 }
 
 #[cfg(test)]
