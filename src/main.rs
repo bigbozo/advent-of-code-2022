@@ -16,7 +16,7 @@ fn main() {
 fn run_day(day: Option<u32>) {
     match day {
         None => {
-            for i in 1..9 {
+            for i in 1..10 {
                 run_day(Some(i));
             }
         }
@@ -59,6 +59,11 @@ fn run_day(day: Option<u32>) {
             print_headline("Day 08");
             adventofcode::day08::run();
             adventofcode::day08::run2();
+        }
+        Some(9) => {
+            print_headline("Day 09 -              Rope Bridge");
+            adventofcode::day09::run();
+            adventofcode::day09::run2();
         }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
