@@ -57,7 +57,7 @@ pub fn run() {
     let max_counts = calculate_best("input/day01-01.txt");
 
 
-    println!("The most calories carried are: {}", Yellow.bold().paint(format!("{}",max_counts)));
+    println!("The most calories carried are: {}", Yellow.bold().paint(max_counts.to_string()));
 }
 pub fn run2() {
     println!("Find the best Three carriers!");

@@ -91,7 +91,7 @@ pub fn run2() {
             min_val = *val;
         }
     }
-    println!("We should delete {} with size: {}", Yellow.bold().paint(format!("{}",target_key)), Yellow.bold().paint(format!("{}",min_val)));
+    println!("We should delete {} with size: {}", Yellow.bold().paint(target_key), Yellow.bold().paint(min_val.to_string()));
 }
 
 #[cfg(test)]
