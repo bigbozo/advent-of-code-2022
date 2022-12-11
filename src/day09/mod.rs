@@ -25,7 +25,6 @@ struct Point {
     x: i32,
     y: i32,
 }
-
 impl Point {
     pub fn chase(&mut self, target: Point) {
         if (target.x - self.x).abs() > 1 || (target.y - self.y).abs() > 1 {
@@ -44,13 +43,11 @@ impl Point {
         }
     }
 }
-
 impl Display for Point {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.x, self.y)
     }
 }
-
 
 fn parse_input(input: String) -> Vec<Command> {
     let mut commands: Vec<Command> = vec![];

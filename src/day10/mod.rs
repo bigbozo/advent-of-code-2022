@@ -1,4 +1,4 @@
-use ansi_term::{Color, Colour};
+use ansi_term::{Colour};
 use ansi_term::Colour::{Blue, Yellow};
 use crate::day10::Op::{AddX, Noop};
 use crate::read_file;
