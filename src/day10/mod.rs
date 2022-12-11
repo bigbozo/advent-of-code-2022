@@ -142,7 +142,7 @@ addx -5".to_string()));
 addx 3
 addx -5".to_string());
 
-        assert_eq!(1, execute_program(program));
+        assert_eq!(0, execute_program(program));
     }
 
     #[test]
