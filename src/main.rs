@@ -1,4 +1,7 @@
-use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, print_headline};
+use adventofcode::{day01, day02, day03, day04, day05,
+                   day06, day07, day08, day09, day10,
+                   day11,
+                   print_headline};
 use clap::Parser;
 
 #[derive(Parser)]
@@ -69,6 +72,11 @@ fn run_day(day: Option<u32>) {
             print_headline("Day 10 -         Cathode-Ray Tube");
             day10::run();
             day10::run2();
+        }
+        Some(11) => {
+            print_headline("Day 11 -     Monkey in the Middle");
+            day11::run();
+            day11::run2();
         }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
