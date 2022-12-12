@@ -92,7 +92,7 @@ fn walk10(input: String) -> usize {
     let commands: Vec<Command> = parse_input(input);
 
     let mut positions: HashMap<String, bool> = HashMap::new();
-    let mut rope = [Point { x: 0 as i32, y: 0 as i32 }; 10];
+    let mut rope = [Point { x: 0_i32, y: 0_i32 }; 10];
 
 
     positions.entry(rope[9].to_string()).or_insert(true);

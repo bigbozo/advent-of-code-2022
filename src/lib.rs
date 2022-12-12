@@ -35,7 +35,7 @@ pub fn print_headline(title: &str) {
     println!("{}",Yellow.bold().paint(line));
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Eq)]
 pub struct Point<T> {
     x: T,
     y: T,
