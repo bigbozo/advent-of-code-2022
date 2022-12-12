@@ -1,6 +1,7 @@
 extern crate core;
 
-use std::fs;
+use std::fmt::{Debug, Display, Formatter};
+use std::{fmt, fs};
 use std::process::exit;
 use ansi_term::Colour::{Yellow};
 
@@ -33,3 +34,20 @@ pub fn print_headline(title: &str) {
     let line = title.chars().into_iter().map(|_| "=").collect::<String>();
     println!("{}",Yellow.bold().paint(line));
 }
+
+#[derive(PartialEq, Clone, Copy)]
+pub struct Point<T> {
+    x: T,
+    y: T,
+}
+impl Display for Point<i32> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.x, self.y)
+    }
+}
+impl Debug for Point<usize> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}|{})", self.x, self.y)
+    }
+}
+

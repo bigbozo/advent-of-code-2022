@@ -1,8 +1,7 @@
 use std::collections::HashMap;
-use std::fmt::{Display, Formatter};
 use std::process::exit;
 use ansi_term::Colour::Yellow;
-use crate::read_file;
+use crate::{Point, read_file};
 use crate::day09::Direction::{D, L, R, U};
 
 #[derive(Debug, PartialEq)]
@@ -20,13 +19,8 @@ struct Command {
 }
 
 
-#[derive(Debug, PartialEq, Clone, Copy)]
-struct Point {
-    x: i32,
-    y: i32,
-}
-impl Point {
-    pub fn chase(&mut self, target: Point) {
+impl Point<i32> {
+    pub fn chase(&mut self, target: Point<i32>) {
         if (target.x - self.x).abs() > 1 || (target.y - self.y).abs() > 1 {
             if target.x < self.x {
                 self.x -= 1;
@@ -43,11 +37,7 @@ impl Point {
         }
     }
 }
-impl Display for Point {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}/{}", self.x, self.y)
-    }
-}
+
 
 fn parse_input(input: String) -> Vec<Command> {
     let mut commands: Vec<Command> = vec![];
@@ -77,8 +67,8 @@ fn walk(input: String) -> usize {
 
     let mut positions: HashMap<String, bool> = HashMap::new();
 
-    let mut head: Point = Point { x: 0, y: 0 };
-    let mut tail: Point = Point { x: 0, y: 0 };
+    let mut head: Point<i32> = Point { x: 0, y: 0 };
+    let mut tail: Point<i32> = Point { x: 0, y: 0 };
 
     positions.entry(tail.to_string()).or_insert(true);
 
@@ -102,7 +92,7 @@ fn walk10(input: String) -> usize {
     let commands: Vec<Command> = parse_input(input);
 
     let mut positions: HashMap<String, bool> = HashMap::new();
-    let mut rope = [Point { x: 0, y: 0 }; 10];
+    let mut rope = [Point { x: 0 as i32, y: 0 as i32 }; 10];
 
 
     positions.entry(rope[9].to_string()).or_insert(true);
