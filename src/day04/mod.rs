@@ -1,5 +1,5 @@
-use ansi_term::Colour::Yellow;
 use crate::read_file;
+use ansi_term::Colour::Yellow;
 
 #[derive(PartialEq, Debug)]
 struct Range {
@@ -73,13 +73,19 @@ pub fn calculate2(filename: &str) -> i32 {
 pub fn run() {
     println!("Camp Cleanup");
     let count = calculate("input/day04.txt");
-    println!("There are {} doubled ranges", Yellow.bold().paint(format!("{}",count)));
+    println!(
+        "There are {} doubled ranges",
+        Yellow.bold().paint(format!("{}", count))
+    );
 }
 
 pub fn run2() {
     println!("This wasn't extensive enough!");
     let count = calculate2("input/day04.txt");
-    println!("There are {} overlapping ranges", Yellow.bold().paint(format!("{}",count)));
+    println!(
+        "There are {} overlapping ranges",
+        Yellow.bold().paint(format!("{}", count))
+    );
 }
 
 #[cfg(test)]

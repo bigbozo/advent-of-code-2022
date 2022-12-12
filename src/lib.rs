@@ -1,9 +1,9 @@
 extern crate core;
 
+use ansi_term::Colour::Yellow;
 use std::fmt::{Debug, Display, Formatter};
-use std::{fmt, fs};
 use std::process::exit;
-use ansi_term::Colour::{Yellow};
+use std::{fmt, fs};
 
 pub mod day01;
 pub mod day02;
@@ -32,7 +32,7 @@ pub fn print_headline(title: &str) {
     println!();
     println!("{}", Yellow.bold().paint(title));
     let line = title.chars().into_iter().map(|_| "=").collect::<String>();
-    println!("{}",Yellow.bold().paint(line));
+    println!("{}", Yellow.bold().paint(line));
 }
 
 #[derive(PartialEq, Clone, Copy, Eq)]
@@ -50,4 +50,3 @@ impl Debug for Point<usize> {
         write!(f, "({}|{})", self.x, self.y)
     }
 }
-

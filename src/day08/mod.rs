@@ -1,7 +1,7 @@
-use std::cmp::{max};
-use ansi_term::Colour::Yellow;
-use crate::day08::Direction::{North, South, East, West};
+use crate::day08::Direction::{East, North, South, West};
 use crate::read_file;
+use ansi_term::Colour::Yellow;
+use std::cmp::max;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Tree {
@@ -27,7 +27,7 @@ impl Tree {
             East => self.west = true,
             West => self.east = true,
             North => self.south = true,
-            South => self.north = true
+            South => self.north = true,
         }
     }
     fn is_visible(&self) -> bool {
@@ -87,10 +87,30 @@ fn scan_forest(forest: &mut Forest) -> &mut Forest {
     let height = forest.len();
     let width = forest[0].len();
 
-    scan_horizontal(forest, (0..height).collect::<Vec<_>>(), (0..width).collect::<Vec<_>>(), East);
-    scan_horizontal(forest, (0..height).collect::<Vec<_>>(), (0..width).rev().collect::<Vec<_>>(), West);
-    scan_vertical(forest, (0..height).collect::<Vec<_>>(), (0..width).collect::<Vec<_>>(), South);
-    scan_vertical(forest, (0..height).rev().collect::<Vec<_>>(), (0..width).collect::<Vec<_>>(), North);
+    scan_horizontal(
+        forest,
+        (0..height).collect::<Vec<_>>(),
+        (0..width).collect::<Vec<_>>(),
+        East,
+    );
+    scan_horizontal(
+        forest,
+        (0..height).collect::<Vec<_>>(),
+        (0..width).rev().collect::<Vec<_>>(),
+        West,
+    );
+    scan_vertical(
+        forest,
+        (0..height).collect::<Vec<_>>(),
+        (0..width).collect::<Vec<_>>(),
+        South,
+    );
+    scan_vertical(
+        forest,
+        (0..height).rev().collect::<Vec<_>>(),
+        (0..width).collect::<Vec<_>>(),
+        North,
+    );
 
     forest
 }
@@ -177,13 +197,19 @@ pub fn run() {
     let mut forest = input_forest("input/day08.txt");
 
     let count = count_visibles(&mut forest);
-    println!("There are {} trees visible", Yellow.bold().paint(format!("{}", count)));
+    println!(
+        "There are {} trees visible",
+        Yellow.bold().paint(format!("{}", count))
+    );
 }
 
 pub fn run2() {
     let forest = input_forest("input/day08.txt");
     let score = max_scenic_score(&forest);
-    println!("The highest scenic scoring tree scores {}", Yellow.bold().paint(format!("{}",score)));
+    println!(
+        "The highest scenic scoring tree scores {}",
+        Yellow.bold().paint(format!("{}", score))
+    );
 }
 
 #[cfg(test)]
@@ -194,13 +220,76 @@ mod test {
     fn parse_input_works() {
         let forest = input_forest("input/day08-test.txt");
 
-        assert_eq!(Tree { north: true, west: true, east: false, south: false, height: 3 }, forest[0][0]);
-        assert_eq!(Tree { north: true, west: true, east: false, south: false, height: 5 }, forest[1][1]);
-        assert_eq!(Tree { north: true, west: false, east: true, south: false, height: 5 }, forest[1][2]);
-        assert_eq!(Tree { north: false, west: false, east: false, south: false, height: 1 }, forest[1][3]);
-        assert_eq!(Tree { north: false, west: false, east: true, south: false, height: 5 }, forest[2][1]);
-        assert_eq!(Tree { north: false, west: false, east: false, south: false, height: 3 }, forest[2][2]);
-        assert_eq!(Tree { north: false, west: false, east: true, south: false, height: 3 }, forest[2][3]);
+        assert_eq!(
+            Tree {
+                north: true,
+                west: true,
+                east: false,
+                south: false,
+                height: 3
+            },
+            forest[0][0]
+        );
+        assert_eq!(
+            Tree {
+                north: true,
+                west: true,
+                east: false,
+                south: false,
+                height: 5
+            },
+            forest[1][1]
+        );
+        assert_eq!(
+            Tree {
+                north: true,
+                west: false,
+                east: true,
+                south: false,
+                height: 5
+            },
+            forest[1][2]
+        );
+        assert_eq!(
+            Tree {
+                north: false,
+                west: false,
+                east: false,
+                south: false,
+                height: 1
+            },
+            forest[1][3]
+        );
+        assert_eq!(
+            Tree {
+                north: false,
+                west: false,
+                east: true,
+                south: false,
+                height: 5
+            },
+            forest[2][1]
+        );
+        assert_eq!(
+            Tree {
+                north: false,
+                west: false,
+                east: false,
+                south: false,
+                height: 3
+            },
+            forest[2][2]
+        );
+        assert_eq!(
+            Tree {
+                north: false,
+                west: false,
+                east: true,
+                south: false,
+                height: 3
+            },
+            forest[2][3]
+        );
     }
 
     #[test]

@@ -1,5 +1,5 @@
-use ansi_term::Colour::Yellow;
 use super::read_file;
+use ansi_term::Colour::Yellow;
 
 pub fn sum_per_elf(filename: &str) -> Vec<i32> {
     let mut counts: Vec<i32> = Vec::new();
@@ -56,15 +56,19 @@ pub fn run() {
     println!("Hello Elves! Let's get started!");
     let max_counts = calculate_best("input/day01-01.txt");
 
-
-    println!("The most calories carried are: {}", Yellow.bold().paint(max_counts.to_string()));
+    println!(
+        "The most calories carried are: {}",
+        Yellow.bold().paint(max_counts.to_string())
+    );
 }
 pub fn run2() {
     println!("Find the best Three carriers!");
 
     println!(
         "The top three elves carry {} calories",
-        Yellow.bold().paint(format!("{}",calculate_best3("input/day01-01.txt")))
+        Yellow
+            .bold()
+            .paint(format!("{}", calculate_best3("input/day01-01.txt")))
     );
 }
 

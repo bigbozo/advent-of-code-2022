@@ -1,5 +1,5 @@
-use ansi_term::Colour::Yellow;
 use crate::read_file;
+use ansi_term::Colour::Yellow;
 use itertools::Itertools;
 
 pub fn validate(input: &str) -> bool {
@@ -32,7 +32,8 @@ pub fn run() {
     let answer = parse_line(&read_file("input/day06.txt")).unwrap();
     println!(
         "Starting packet marker starts at: {}",
-        Yellow.bold().paint(format!("{}", answer)));
+        Yellow.bold().paint(format!("{}", answer))
+    );
 }
 
 pub fn run2() {
@@ -40,7 +41,8 @@ pub fn run2() {
     let answer = parse_line_with_packet_size(&read_file("input/day06.txt"), 14).unwrap();
     println!(
         "Message stream starts at: {}",
-        Yellow.bold().paint(format!("{}", answer)));
+        Yellow.bold().paint(format!("{}", answer))
+    );
 }
 
 #[cfg(test)]

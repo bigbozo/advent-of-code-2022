@@ -1,6 +1,6 @@
 use super::read_file;
-use std::collections::HashMap;
 use ansi_term::Colour::Yellow;
+use std::collections::HashMap;
 
 pub fn get_parsed_input(filename: &str) -> HashMap<String, u32> {
     let mut hash_map = HashMap::new();
@@ -97,7 +97,10 @@ pub fn run() {
         score_matrix('X', 'Y', 'Z'),
     );
 
-    println!("Your totaled score: {}", Yellow.bold().paint(format!("{}",score)));
+    println!(
+        "Your totaled score: {}",
+        Yellow.bold().paint(format!("{}", score))
+    );
 }
 
 pub fn run2() {
@@ -108,7 +111,10 @@ pub fn run2() {
         score_matrix2('Z', 'Y', 'X'),
     );
 
-    println!("You're adapted score is {}.", Yellow.bold().paint(format!("{}",score)));
+    println!(
+        "You're adapted score is {}.",
+        Yellow.bold().paint(format!("{}", score))
+    );
 }
 
 #[cfg(test)]

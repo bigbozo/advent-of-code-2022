@@ -1,8 +1,8 @@
+use crate::day09::Direction::{D, L, R, U};
+use crate::{read_file, Point};
+use ansi_term::Colour::Yellow;
 use std::collections::HashMap;
 use std::process::exit;
-use ansi_term::Colour::Yellow;
-use crate::{Point, read_file};
-use crate::day09::Direction::{D, L, R, U};
 
 #[derive(Debug, PartialEq)]
 enum Direction {
@@ -17,7 +17,6 @@ struct Command {
     dir: Direction,
     amount: u32,
 }
-
 
 impl Point<i32> {
     pub fn chase(&mut self, target: Point<i32>) {
@@ -37,7 +36,6 @@ impl Point<i32> {
         }
     }
 }
-
 
 fn parse_input(input: String) -> Vec<Command> {
     let mut commands: Vec<Command> = vec![];
@@ -78,7 +76,7 @@ fn walk(input: String) -> usize {
                 U => head.y -= 1,
                 R => head.x += 1,
                 D => head.y += 1,
-                L => head.x -= 1
+                L => head.x -= 1,
             }
             tail.chase(head);
             positions.entry(tail.to_string()).or_insert(true);
@@ -94,7 +92,6 @@ fn walk10(input: String) -> usize {
     let mut positions: HashMap<String, bool> = HashMap::new();
     let mut rope = [Point { x: 0_i32, y: 0_i32 }; 10];
 
-
     positions.entry(rope[9].to_string()).or_insert(true);
 
     for command in commands {
@@ -103,7 +100,7 @@ fn walk10(input: String) -> usize {
                 U => rope[0].y -= 1,
                 R => rope[0].x += 1,
                 D => rope[0].y += 1,
-                L => rope[0].x -= 1
+                L => rope[0].x -= 1,
             }
             for i in 1..10 {
                 rope[i].chase(rope[i - 1]);
@@ -119,14 +116,20 @@ pub fn run() {
     let input = read_file("input/day09.txt");
     let count = walk(input);
 
-    println!("The Tail visits {} positions.", Yellow.bold().paint(format!("{}", count)));
+    println!(
+        "The Tail visits {} positions.",
+        Yellow.bold().paint(format!("{}", count))
+    );
 }
 
 pub fn run2() {
     let input = read_file("input/day09.txt");
     let count = walk10(input);
 
-    println!("The 10-Foot-Rope-Tail visits {} positions.", Yellow.bold().paint(format!("{}", count)));
+    println!(
+        "The 10-Foot-Rope-Tail visits {} positions.",
+        Yellow.bold().paint(format!("{}", count))
+    );
 }
 
 #[cfg(test)]

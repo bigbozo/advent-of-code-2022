@@ -1,5 +1,5 @@
-use ansi_term::Colour::Yellow;
 use crate::read_file;
+use ansi_term::Colour::Yellow;
 use regex::Regex;
 
 #[derive(PartialEq, Debug)]
@@ -125,7 +125,10 @@ pub fn run() {
     let (mut stacks, instructions) = parse_input("input/day05.txt");
     stacks.perform_instructions(instructions);
     let answer: String = stacks.get_tops().iter().collect();
-    println!("Final Supply Stack top crates: {}", Yellow.bold().paint(answer));
+    println!(
+        "Final Supply Stack top crates: {}",
+        Yellow.bold().paint(answer)
+    );
 }
 
 pub fn run2() {

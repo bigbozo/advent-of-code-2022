@@ -1,7 +1,7 @@
-use ansi_term::{Colour};
-use ansi_term::Colour::{Blue, Yellow};
 use crate::day10::Op::{AddX, Noop};
 use crate::read_file;
+use ansi_term::Colour;
+use ansi_term::Colour::{Blue, Yellow};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Op {
@@ -10,7 +10,6 @@ pub enum Op {
 }
 
 type Program = Vec<Op>;
-
 
 type Screen = [[char; 40]; 6];
 
@@ -73,8 +72,7 @@ pub fn draw_screen(program: Program) -> Screen {
 
     let mut x: i32 = 1;
 
-
-    for (i,item) in program.iter().enumerate() {
+    for (i, item) in program.iter().enumerate() {
         let screen_x = i % 40;
         let screen_y = (i - screen_x) / 40;
 
@@ -97,26 +95,27 @@ pub fn draw_screen(program: Program) -> Screen {
 
 pub fn run() {
     let program = parse_program(read_file("input/day10.txt"));
-    println!("Sum of signal strengths is {}", Yellow.bold().paint(execute_program(program).to_string()));
+    println!(
+        "Sum of signal strengths is {}",
+        Yellow.bold().paint(execute_program(program).to_string())
+    );
 }
 
 pub fn run2() {
     let program = parse_program(read_file("input/day10.txt"));
     let screen = draw_screen(program);
 
-
     println!("Screen output of program:");
     for scan_line in screen {
         for pixel in scan_line {
             match pixel {
                 '#' => print!("{}", Yellow.bold().on(Colour::Yellow).paint(" ")),
-                _ => print!("{}", Blue.bold().on(Colour::Blue).paint(" "))
+                _ => print!("{}", Blue.bold().on(Colour::Blue).paint(" ")),
             }
         }
         println!();
     }
 }
-
 
 #[cfg(test)]
 mod test {
@@ -131,16 +130,25 @@ mod test {
 
     #[test]
     fn parse_program_works() {
-        assert_eq!(vec![Noop, Noop, AddX(3), Noop, AddX(-5)], parse_program("noop
+        assert_eq!(
+            vec![Noop, Noop, AddX(3), Noop, AddX(-5)],
+            parse_program(
+                "noop
 addx 3
-addx -5".to_string()));
+addx -5"
+                    .to_string()
+            )
+        );
     }
 
     #[test]
     fn run_program() {
-        let program = parse_program("noop
+        let program = parse_program(
+            "noop
 addx 3
-addx -5".to_string());
+addx -5"
+                .to_string(),
+        );
 
         assert_eq!(0, execute_program(program));
     }

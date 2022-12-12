@@ -1,13 +1,7 @@
-use regex::Regex;
+use crate::day11::Operation::{Add, Mul};
+use crate::day11::Parameter::{Constant, Old};
 use crate::read_file;
-use crate::day11::Operation::{
-    Mul,
-    Add,
-};
-use crate::day11::Parameter::{
-    Old,
-    Constant,
-};
+use regex::Regex;
 
 #[derive(Debug, PartialEq, Clone, Eq)]
 pub enum Parameter {
@@ -34,7 +28,7 @@ pub struct Monkey {
     items: Vec<usize>,
     op: Operation,
     test: Test,
-    inspected: usize
+    inspected: usize,
 }
 
 type MonkeyHorde = Vec<Monkey>;
@@ -43,11 +37,11 @@ pub fn parse_op(input: &str) -> Operation {
     let parts: Vec<&str> = input.split_whitespace().collect();
     let left = match parts[0] {
         "old" => Old,
-        _ => Constant(parts[0].parse().unwrap())
+        _ => Constant(parts[0].parse().unwrap()),
     };
     let right = match parts[2] {
         "old" => Old,
-        _ => Constant(parts[2].parse().unwrap())
+        _ => Constant(parts[2].parse().unwrap()),
     };
     match parts[1] {
         "*" => Mul(left, right),
@@ -63,7 +57,6 @@ pub fn parse_monkey(input: &str) -> Monkey {
 
     let cap = regex.captures(input).unwrap();
 
-
     Monkey {
         id: cap[1].parse().unwrap(),
         items: cap[2].split(", ").map(|c| c.parse().unwrap()).collect(),
@@ -73,7 +66,7 @@ pub fn parse_monkey(input: &str) -> Monkey {
             true_target: cap[5].parse().unwrap(),
             false_target: cap[6].parse().unwrap(),
         },
-        inspected: 0
+        inspected: 0,
     }
 }
 
@@ -86,8 +79,6 @@ fn parse_monkeys(input: String) -> MonkeyHorde {
 }
 
 pub fn run_turns(monkeys: &mut MonkeyHorde, count: usize, worry_mul: usize) {
-
-
     let mut kgv = 1;
     for monkey in monkeys.iter_mut() {
         kgv *= monkey.test.divisor;
@@ -114,11 +105,9 @@ pub fn run_turns(monkeys: &mut MonkeyHorde, count: usize, worry_mul: usize) {
 }
 
 pub fn monkey_business_level(monkeys: &mut MonkeyHorde) -> usize {
-
-    monkeys.sort_by(|a,b| a.inspected.cmp(&b.inspected));
+    monkeys.sort_by(|a, b| a.inspected.cmp(&b.inspected));
 
     monkeys.pop().unwrap().inspected * monkeys.pop().unwrap().inspected
-
 }
 
 fn perform_op(value: usize, op: &Operation, kgv: usize) -> usize {
@@ -126,36 +115,37 @@ fn perform_op(value: usize, op: &Operation, kgv: usize) -> usize {
         Add(left, right) => {
             let l = match left {
                 Constant(v) => *v,
-                Old => value
+                Old => value,
             };
             let r = match right {
                 Constant(v) => *v,
-                Old => value
+                Old => value,
             };
             (l + r) % kgv
         }
         Mul(left, right) => {
             let l = match left {
                 Constant(v) => *v,
-                Old => value
+                Old => value,
             };
             let r = match right {
                 Constant(v) => *v,
-                Old => value
+                Old => value,
             };
             (l * r) % kgv
         }
     }
 }
 
-
 pub fn run() {
     let input = read_file("input/day11.txt");
     let mut monkeys = parse_monkeys(input);
     run_turns(&mut monkeys, 20, 3);
 
-    println!("Level of monkey business: {}", monkey_business_level(&mut monkeys));
-
+    println!(
+        "Level of monkey business: {}",
+        monkey_business_level(&mut monkeys)
+    );
 }
 
 pub fn run2() {
@@ -163,10 +153,11 @@ pub fn run2() {
     let mut monkeys = parse_monkeys(input);
     run_turns(&mut monkeys, 10_000, 1);
 
-    println!("Level of monkey business after 10000 rounds: {}", monkey_business_level(&mut monkeys));
-
+    println!(
+        "Level of monkey business after 10000 rounds: {}",
+        monkey_business_level(&mut monkeys)
+    );
 }
-
 
 #[cfg(test)]
 mod test {
@@ -174,18 +165,27 @@ mod test {
 
     #[test]
     fn parse_monkey_works() {
-        assert_eq!(Monkey {
-            id: 0,
-            items: vec![79, 98],
-            op: Mul(Old, Constant(19)),
-            test: Test { divisor: 23, true_target: 2, false_target: 3, },
-            inspected: 0,
-        }, parse_monkey("Monkey 0:
+        assert_eq!(
+            Monkey {
+                id: 0,
+                items: vec![79, 98],
+                op: Mul(Old, Constant(19)),
+                test: Test {
+                    divisor: 23,
+                    true_target: 2,
+                    false_target: 3,
+                },
+                inspected: 0,
+            },
+            parse_monkey(
+                "Monkey 0:
   Starting items: 79, 98
   Operation: new = old * 19
   Test: divisible by 23
     If true: throw to monkey 2
-    If false: throw to monkey 3"));
+    If false: throw to monkey 3"
+            )
+        );
     }
 
     #[test]
@@ -197,7 +197,10 @@ mod test {
 
     #[test]
     fn perform_ops_work() {
-        assert_eq!(1501, perform_op(79, &Mul(Old, Constant(19)),23 * 19 * 13 * 17));
+        assert_eq!(
+            1501,
+            perform_op(79, &Mul(Old, Constant(19)), 23 * 19 * 13 * 17)
+        );
     }
 
     #[test]
@@ -209,7 +212,6 @@ mod test {
         assert_eq!(0, monkeys[2].items.len());
         assert_eq!(0, monkeys[3].items.len());
         assert_eq!(vec![2080, 25, 167, 207, 401, 1046], monkeys[1].items);
-
 
         run_turns(&mut monkeys, 19, 3);
 
@@ -224,11 +226,10 @@ mod test {
         let input = read_file("input/day11-test.txt");
         let mut monkeys = parse_monkeys(input);
         run_turns(&mut monkeys, 20, 3);
-        assert_eq!(101,monkeys[0].inspected);
-        assert_eq!(95,monkeys[1].inspected);
-        assert_eq!(7,monkeys[2].inspected);
-        assert_eq!(105,monkeys[3].inspected);
-
+        assert_eq!(101, monkeys[0].inspected);
+        assert_eq!(95, monkeys[1].inspected);
+        assert_eq!(7, monkeys[2].inspected);
+        assert_eq!(105, monkeys[3].inspected);
     }
     #[test]
     fn calc_monkey_business_level_works() {
@@ -237,7 +238,6 @@ mod test {
         run_turns(&mut monkeys, 20, 3);
 
         assert_eq!(10605, monkey_business_level(&mut monkeys));
-
     }
 
     #[test]
@@ -247,8 +247,5 @@ mod test {
         run_turns(&mut monkeys, 10_000, 1);
 
         assert_eq!(2713310158, monkey_business_level(&mut monkeys));
-
     }
-
-
 }
