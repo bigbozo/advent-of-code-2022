@@ -7,10 +7,17 @@ struct Field {
     height: u32,
     distance_to_end: u32,
 }
-
 impl Debug for Field {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[h:{}|D:{}]", self.height, self.distance_to_end)
+    }
+}
+impl Field {
+    pub fn new(height: u32) -> Field {
+        Field {
+            height,
+            distance_to_end: u32::MAX,
+        }
     }
 }
 
@@ -22,30 +29,18 @@ struct Game {
     end: Point<usize>,
 }
 
-impl Field {
-    pub fn new(height: u32) -> Field {
-        Field {
-            height,
-            distance_to_end: u32::MAX,
-        }
-    }
-}
-
 
 type HeightMap = Vec<Vec<Field>>;
 
-
 fn parse_input(input: String) -> Game {
     let mut height_map: HeightMap = vec![];
-    let mut y: usize = 0;
-    let mut x: usize;
     let mut end: Point<usize> = Point { x: 0, y: 0 };
     let mut start: Point<usize> = Point { x: 0, y: 0 };
 
-    for line in input.lines() {
+    for (y,line) in input.lines().enumerate() {
         let mut row: Vec<Field> = vec![];
-        x = 0;
-        for char in line.chars() {
+
+        for (x,char) in line.chars().enumerate() {
             match char {
                 'E' => {
                     row.push(Field::new(0));
@@ -62,10 +57,9 @@ fn parse_input(input: String) -> Game {
                     row.push(Field::new(u32::MAX));
                 }
             }
-            x += 1
         }
         height_map.push(row);
-        y += 1;
+
     }
     height_map[end.y as usize][end.x as usize].height = height_map
         .iter()
@@ -126,7 +120,6 @@ fn walk(height_map: &mut HeightMap, point: Point<usize>, distance: u32) {
     }
 }
 
-
 pub fn run() {
     let mut game = parse_input(read_file("input/day12.txt"));
 
@@ -135,7 +128,6 @@ pub fn run() {
 
 
 }
-
 pub fn run2() {
     let mut game = parse_input(read_file("input/day12.txt"));
 
@@ -152,4 +144,3 @@ pub fn run2() {
 
     println!(" The shortest way from height a is {} long", shortest);
 }
-
