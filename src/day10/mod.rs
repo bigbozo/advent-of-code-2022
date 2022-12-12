@@ -3,7 +3,7 @@ use ansi_term::Colour::{Blue, Yellow};
 use crate::day10::Op::{AddX, Noop};
 use crate::read_file;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Op {
     Noop,
     AddX(i32),
@@ -49,7 +49,7 @@ pub fn execute_program(program: Program) -> i32 {
     let mut x = 1;
     let mut signal_strength = 0;
 
-    for i in 0..program.len() {
+    for (i, item) in program.iter().enumerate() {
         // start of cycle
 
         // during cycle
@@ -58,7 +58,7 @@ pub fn execute_program(program: Program) -> i32 {
         }
 
         // after cycle
-        match program[i] {
+        match item {
             AddX(value) => {
                 x += value;
             }
@@ -74,7 +74,7 @@ pub fn draw_screen(program: Program) -> Screen {
     let mut x: i32 = 1;
 
 
-    for i in 0..program.len() {
+    for (i,item) in program.iter().enumerate() {
         let screen_x = i % 40;
         let screen_y = (i - screen_x) / 40;
 
@@ -85,7 +85,7 @@ pub fn draw_screen(program: Program) -> Screen {
         }
 
         // after cycle
-        match program[i] {
+        match item {
             AddX(value) => {
                 x += value;
             }
