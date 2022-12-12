@@ -9,26 +9,26 @@ use crate::day11::Parameter::{
     Constant,
 };
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Eq)]
 pub enum Parameter {
     Constant(usize),
     Old,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Eq)]
 pub enum Operation {
     Add(Parameter, Parameter),
     Mul(Parameter, Parameter),
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Eq)]
 pub struct Test {
     divisor: usize,
     true_target: usize,
     false_target: usize,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Eq)]
 pub struct Monkey {
     id: usize,
     items: Vec<usize>,
@@ -89,7 +89,7 @@ pub fn run_turns(monkeys: &mut MonkeyHorde, count: usize, worry_mul: usize) {
 
 
     let mut kgv = 1;
-    for monkey in monkeys.into_iter() {
+    for monkey in monkeys.iter_mut() {
         kgv *= monkey.test.divisor;
     }
 
@@ -102,7 +102,7 @@ pub fn run_turns(monkeys: &mut MonkeyHorde, count: usize, worry_mul: usize) {
             monkeys[monkey.id].inspected += monkey.items.len() as usize;
             let op = &monkey.op;
             for item in monkey.items {
-                let score = perform_op(item, &op, kgv) / worry_mul;
+                let score = perform_op(item, op, kgv) / worry_mul;
                 if score % monkey.test.divisor > 0 {
                     monkeys[false_target].items.push(score);
                 } else {
