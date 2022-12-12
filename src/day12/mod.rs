@@ -1,26 +1,25 @@
+use crate::{read_file, Point};
 use std::fmt;
 use std::fmt::Debug;
-use crate::{Point, read_file};
 
 #[derive(PartialEq, Copy, Clone)]
 struct Field {
     height: u32,
-    distance_to_end: u32,
+    distance: u32,
 }
 impl Debug for Field {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[h:{}|D:{}]", self.height, self.distance_to_end)
+        write!(f, "[h:{}|D:{}]", self.height, self.distance)
     }
 }
 impl Field {
     pub fn new(height: u32) -> Field {
         Field {
             height,
-            distance_to_end: u32::MAX,
+            distance: u32::MAX,
         }
     }
 }
-
 
 #[derive(Debug, PartialEq)]
 struct Game {
@@ -29,7 +28,6 @@ struct Game {
     end: Point<usize>,
 }
 
-
 type HeightMap = Vec<Vec<Field>>;
 
 fn parse_input(input: String) -> Game {
@@ -37,10 +35,10 @@ fn parse_input(input: String) -> Game {
     let mut end: Point<usize> = Point { x: 0, y: 0 };
     let mut start: Point<usize> = Point { x: 0, y: 0 };
 
-    for (y,line) in input.lines().enumerate() {
+    for (y, line) in input.lines().enumerate() {
         let mut row: Vec<Field> = vec![];
 
-        for (x,char) in line.chars().enumerate() {
+        for (x, char) in line.chars().enumerate() {
             match char {
                 'E' => {
                     row.push(Field::new(0));
@@ -59,16 +57,12 @@ fn parse_input(input: String) -> Game {
             }
         }
         height_map.push(row);
-
     }
     height_map[end.y as usize][end.x as usize].height = height_map
         .iter()
-        .map(|line| line
-            .iter()
-            .map(|cell| cell.height)
-            .max().unwrap())
-        .max().unwrap();
-
+        .map(|line| line.iter().map(|cell| cell.height).max().unwrap())
+        .max()
+        .unwrap();
 
     Game {
         height_map,
@@ -77,45 +71,41 @@ fn parse_input(input: String) -> Game {
     }
 }
 
-fn walk(height_map: &mut HeightMap, point: Point<usize>, distance: u32) {
-    let field = height_map[point.y][point.x];
+fn walk(height_map: &mut HeightMap, p: Point<usize>, distance: u32) {
+    let field = height_map[p.y][p.x];
 
-    if height_map[point.y][point.x].distance_to_end > distance {
-        height_map[point.y][point.x].distance_to_end = distance
+    if height_map[p.y][p.x].distance > distance {
+        height_map[p.y][p.x].distance = distance
     } else {
         return;
     }
 
     // UP
-    if point.y > 0 {
-        let target = height_map[point.y - 1][point.x];
-        if target.height >= field.height - 1 &&
-            target.distance_to_end > distance + 1 {
-            walk(height_map, Point { y: point.y - 1, x: point.x }, distance + 1);
+    if p.y > 0 {
+        let target = height_map[p.y - 1][p.x];
+        if target.height >= field.height - 1 && target.distance > distance + 1 {
+            walk(height_map, Point { y: p.y - 1, x: p.x }, distance + 1);
         }
     }
     // DOWN
-    if point.y < height_map.len() - 1 {
-        let target = height_map[point.y + 1][point.x];
-        if target.height >= field.height - 1 &&
-            target.distance_to_end > distance + 1 {
-            walk(height_map, Point { y: point.y + 1, x: point.x }, distance + 1);
+    if p.y < height_map.len() - 1 {
+        let target = height_map[p.y + 1][p.x];
+        if target.height >= field.height - 1 && target.distance > distance + 1 {
+            walk(height_map, Point { y: p.y + 1, x: p.x }, distance + 1);
         }
     }
     // LEFT
-    if point.x > 0 {
-        let target = height_map[point.y][point.x - 1];
-        if target.height >= field.height - 1 &&
-            target.distance_to_end > distance + 1 {
-            walk(height_map, Point { y: point.y, x: point.x - 1 }, distance + 1);
+    if p.x > 0 {
+        let target = height_map[p.y][p.x - 1];
+        if target.height >= field.height - 1 && target.distance > distance + 1 {
+            walk(height_map, Point { y: p.y, x: p.x - 1 }, distance + 1);
         }
     }
     //RIGHT
-    if point.x < height_map[0].len() - 1 {
-        let target = height_map[point.y][point.x + 1];
-        if target.height >= field.height - 1 &&
-            target.distance_to_end > distance + 1 {
-            walk(height_map, Point { y: point.y, x: point.x + 1 }, distance + 1);
+    if p.x < height_map[0].len() - 1 {
+        let target = height_map[p.y][p.x + 1];
+        if target.height >= field.height - 1 && target.distance > distance + 1 {
+            walk(height_map, Point { y: p.y, x: p.x + 1 }, distance + 1);
         }
     }
 }
@@ -124,23 +114,28 @@ pub fn run() {
     let mut game = parse_input(read_file("input/day12.txt"));
 
     walk(&mut game.height_map, game.end, 0);
-    println!(" The way is {} long", game.height_map[game.start.y][game.start.x].distance_to_end);
-
-
+    println!(
+        " The way is {} long",
+        game.height_map[game.start.y][game.start.x].distance
+    );
 }
 pub fn run2() {
     let mut game = parse_input(read_file("input/day12.txt"));
 
     walk(&mut game.height_map, game.end, 0);
 
-    let shortest = game.height_map
+    let shortest = game
+        .height_map
         .iter()
-        .map(|line| line
-            .iter()
-            .filter(|cell| cell.height == 1)
-            .map(|cell| cell.distance_to_end)
-            .min().unwrap())
-        .min().unwrap();
+        .map(|line| {
+            line.iter()
+                .filter(|cell| cell.height == 1)
+                .map(|cell| cell.distance)
+                .min()
+                .unwrap()
+        })
+        .min()
+        .unwrap();
 
     println!(" The shortest way from height a is {} long", shortest);
 }
