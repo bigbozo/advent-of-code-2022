@@ -22,17 +22,14 @@ impl PartialEq for ListItem {
 
 impl Ord for ListItem {
     fn cmp(&self, other: &Self) -> Ordering {
-        match (self, other) {
+        let result = match (self, other) {
             (Value(a), Value(b)) => a.cmp(b),
             (Value(a), ItemList(b)) => vec![Value(*a)].cmp(b),
-            (ItemList(a), Value(b)) => vec![Value(*b)].cmp(a),
-            (ItemList(a), ItemList(b)) => {
-                match a.len().cmp(&b.len()) {
-                    Ordering::Less => Ordering::Less,
-                    _ => a.cmp(b)
-                }
-            }
-        }
+            (ItemList(a), Value(b)) => a.cmp(&vec![Value(*b)]),
+            (ItemList(a), ItemList(b)) => a.cmp(b)
+        };
+
+        result
     }
 }
 
@@ -152,7 +149,7 @@ mod test {
     #[test]
     fn correct_answer() {
         let mut count = 0;
-        let input = read_file("input/day13-test.txt");
+        let input = read_file("input/day13.txt");
         let pairs = input.split("\n\n");
         for (i, pair) in pairs.enumerate() {
             let (left, right) = pair.split_once('\n').unwrap();
@@ -160,7 +157,7 @@ mod test {
             let right = parse_list(right);
 
             if left < right {
-                println!("{}", i);
+                println!("{}", i + 1);
                 count += i + 1;
             }
         }
