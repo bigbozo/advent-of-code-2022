@@ -1,35 +1,47 @@
-use crate::day13::ListItem::{ItemList, Value, Empty};
+use std::cmp::Ordering;
+use crate::day13::ListItem::{ItemList, Value};
 use crate::day13::ParseMode::{FindItems, FindRight};
 
+#[derive(Debug, Eq)]
 enum ListItem {
     ItemList(Vec<ListItem>),
     Value(u32),
-    Empty,
 }
 
-impl ListItem {
-    pub fn less_than(&self, item: ListItem) -> bool {
-        match self {
-            ItemList(a) =>
-                match item {
-                    ItemList(b) => { a.less_than(b)}
-                    Value(b) => { a.less_than}
-                    Empty => { false }
-                }
-            Value(a) => {
-                match item {
-                    ItemList(_) => {}
-                    Value(b) => { b > *a }
-                    Empty => {}
-                }
-            }
-            Empty => {
-                true
-            }
+impl PartialEq for ListItem {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Value(a), Value(b)) => a == b,
+            (Value(a), ItemList(b)) => vec![Value(*a)] == *b,
+            (ItemList(a), Value(b)) => vec![Value(*b)] == *a,
+            (ItemList(a), ItemList(b)) => a == b
         }
-        false
     }
 }
+
+
+impl Ord for ListItem {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (Value(a), Value(b)) => a.cmp(b),
+            (Value(a), ItemList(b)) => vec![Value(*a)].cmp(b),
+            (ItemList(a), Value(b)) => vec![Value(*b)].cmp(a),
+            (ItemList(a), ItemList(b)) => {
+                match a.len().cmp(&b.len()) {
+                    Ordering::Less => Ordering::Less,
+                    _ => a.cmp(b)
+                }
+            }
+        }
+    }
+}
+
+impl PartialOrd for ListItem {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 
 enum ParseMode {
     FindRight,
@@ -37,8 +49,8 @@ enum ParseMode {
 }
 
 fn parse_list(input: &str) -> ListItem {
-    if input.len() == 0 {
-        return ItemList(vec![Empty]);
+    if input.is_empty() {
+        return ItemList(vec![]);
     }
     let mut cursor = 0;
     let mut capture_start = 0;
@@ -71,7 +83,7 @@ fn parse_list(input: &str) -> ListItem {
                     '[' => {
                         parse_mode = FindRight;
                         capture_start = cursor + 1;
-                        level = level + 1;
+                        level += 1;
                     }
                     ',' | ']' => {
                         if cursor > capture_start {
@@ -94,7 +106,6 @@ fn parse_list(input: &str) -> ListItem {
 }
 
 
-
 pub fn run() {}
 
 pub fn run2() {}
@@ -102,11 +113,12 @@ pub fn run2() {}
 
 #[cfg(test)]
 mod test {
+    use crate::read_file;
     use super::*;
 
     #[test]
     fn list_parsing() {
-        assert_eq!(ItemList(vec![ItemList(vec![Empty])]), parse_list("[]"));
+        assert_eq!(ItemList(vec![ItemList(vec![])]), parse_list("[]"));
         assert_eq!(ItemList(vec![ItemList(vec![Value(1)])]), parse_list("[1]"));
         assert_eq!(ItemList(vec![ItemList(vec![Value(1), Value(2)])]), parse_list("[1,2]"));
         assert_eq!(ItemList(vec![ItemList(vec![Value(1), ItemList(vec![Value(1), Value(2)])])]), parse_list("[1,[1,2]]"));
@@ -130,5 +142,28 @@ mod test {
                     Value(9),
                 ])
         ]), parse_list("[1,[2,[3,[4,[5,6,0]]]],8,9]"));
+    }
+
+    #[test]
+    fn less_than() {
+        assert_eq!(true, parse_list("[1]") < parse_list("[2]"));
+    }
+
+    #[test]
+    fn correct_answer() {
+        let mut count = 0;
+        let input = read_file("input/day13-test.txt");
+        let pairs = input.split("\n\n");
+        for (i, pair) in pairs.enumerate() {
+            let (left, right) = pair.split_once('\n').unwrap();
+            let left = parse_list(left);
+            let right = parse_list(right);
+
+            if left < right {
+                println!("{}", i);
+                count += i + 1;
+            }
+        }
+        println!("{}", count);
     }
 }
