@@ -1,6 +1,10 @@
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
+use std::fs::File;
+use std::io::BufWriter;
+use std::path::Path;
 use itertools::Itertools;
+use png::Encoder;
 use crate::Point;
 use crate::read_file;
 
@@ -84,6 +88,21 @@ impl Board {
             'o' => 1,
             _ => 0
         }).sum::<usize>()).sum()
+    }
+
+    pub fn save_png(&self, filename: &str) {
+        let full_file = "output/".to_string() + filename;
+        let path = Path::new(&full_file);
+        let file = File::create(path).unwrap();
+        let ref mut w = BufWriter::new(file);
+
+        let mut encoder = Encoder::new(w, self.map[0].len() as u32, self.map.len() as u32);
+        encoder.set_color(png::ColorType::Grayscale);
+        let mut writer = encoder.write_header().unwrap();
+
+        let data: Vec<u8> = self.map.iter().map(|row| row.iter().map(|cell| *cell as u8).collect::<Vec<u8>>()).collect::<Vec<Vec<u8>>>().concat();
+
+        writer.write_image_data(&data).unwrap();
     }
 }
 
@@ -204,9 +223,11 @@ pub fn run() {
 
     run_simulation(&mut board);
 
-    println!("{}", board);
 
-    println!("{} units sand are collected!", board.count_sand())
+    println!("{} units sand are collected!", board.count_sand());
+    println!("I painted a nice picture for you (output/day14-a.png)");
+
+    board.save_png("day14-a.png");
 }
 
 pub fn run2() {
@@ -216,9 +237,9 @@ pub fn run2() {
     let mut board = create_board(ruleset).unwrap();
     run_simulation(&mut board);
 
-    println!("{}", board);
-
-    println!("{} units of sand come to rest", board.count_sand())
+    println!("{} units of sand come to rest", board.count_sand());
+    println!("This pic is even nicer (output/day14-b.png)");
+    board.save_png("day14-b.png");
 }
 
 #[cfg(test)]
@@ -304,7 +325,9 @@ mod test {
 
         run_simulation(&mut board);
 
-        assert_eq!(24, board.count_sand())
+        assert_eq!(24, board.count_sand());
+
+        board.save_png("day14-test-a.png");
     }
 
     #[test]
@@ -317,6 +340,8 @@ mod test {
 
         println!("{}", board);
 
-        assert_eq!(93, board.count_sand())
+        assert_eq!(93, board.count_sand());
+
+        board.save_png("day14-test-b.png");
     }
 }
