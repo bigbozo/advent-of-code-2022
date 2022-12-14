@@ -53,12 +53,29 @@ pub struct Point<T> {
     x: T,
     y: T,
 }
+
+impl<T> Point<T> {
+    pub fn new(x: T, y: T) -> Point<T> {
+        Point {
+            x,
+            y,
+        }
+    }
+}
+
 impl Display for Point<i32> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.x, self.y)
     }
 }
+
 impl Debug for Point<usize> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}|{})", self.x, self.y)
+    }
+}
+
+impl Debug for Point<i32> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}|{})", self.x, self.y)
     }

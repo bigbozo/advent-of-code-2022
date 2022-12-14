@@ -175,7 +175,6 @@ mod test {
 
     #[test]
     fn correct_answer_two() {
-        let mut count = 0;
         let input = read_file("input/day13.txt") + "\n\n[[2]]\n[[6]]";
 
         let mut packet_list: Vec<ListItem> = vec![];
@@ -190,12 +189,12 @@ mod test {
         let marker1 = packet_list
             .iter()
             .enumerate()
-            .find(|(i, item)| ItemList(vec![ItemList(vec![Value(2)])]) == **item)
+            .find(|(_i, item)| ItemList(vec![ItemList(vec![Value(2)])]) == **item)
             .unwrap();
         let marker2 = packet_list
             .iter()
             .enumerate()
-            .find(|(i, item)| ItemList(vec![ItemList(vec![Value(6)])]) == **item)
+            .find(|(_i, item)| ItemList(vec![ItemList(vec![Value(6)])]) == **item)
             .unwrap();
 
         println!("{:?}", { (marker1.0 + 1) * (marker2.0 + 1) });
