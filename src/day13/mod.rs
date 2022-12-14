@@ -22,14 +22,12 @@ impl PartialEq for ListItem {
 
 impl Ord for ListItem {
     fn cmp(&self, other: &Self) -> Ordering {
-        let result = match (self, other) {
+        match (self, other) {
             (Value(a), Value(b)) => a.cmp(b),
             (Value(a), ItemList(b)) => vec![Value(*a)].cmp(b),
             (ItemList(a), Value(b)) => a.cmp(&vec![Value(*b)]),
             (ItemList(a), ItemList(b)) => a.cmp(b)
-        };
-
-        result
+        }
     }
 }
 
@@ -162,5 +160,34 @@ mod test {
             }
         }
         println!("{}", count);
+    }
+
+    #[test]
+    fn correct_answer_two() {
+        let mut count = 0;
+        let input = read_file("input/day13.txt") + "\n\n[[2]]\n[[6]]";
+
+        let mut packet_list: Vec<ListItem> = vec![];
+
+        for line in input.lines() {
+            if !line.is_empty() {
+                packet_list.push(parse_list(line))
+            }
+        }
+        packet_list.sort();
+
+        let marker1 = packet_list
+            .iter()
+            .enumerate()
+            .find(|(i, item)| ItemList(vec![ItemList(vec![Value(2)])]) == **item)
+            .unwrap();
+        let marker2 = packet_list
+            .iter()
+            .enumerate()
+            .find(|(i, item)| ItemList(vec![ItemList(vec![Value(6)])]) == **item)
+            .unwrap();
+
+
+        println!("{:?}", { (marker1.0 + 1) * (marker2.0 + 1) });
     }
 }
