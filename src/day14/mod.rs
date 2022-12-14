@@ -189,7 +189,7 @@ fn run_simulation(board: &mut Board) {
             cx = 500;
             cy = 0;
         }
-        
+
         if board.is_outside(cx, cy) {
             break;
         }
