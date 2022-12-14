@@ -84,12 +84,12 @@ fn run_day(day: Option<u32>) {
             day12::run2();
         }
         Some(13) => {
-            print_headline("Day 12 -          Distress Signal");
+            print_headline("Day 13 -          Distress Signal");
             day13::run();
             day13::run2();
         }
         Some(14) => {
-            print_headline("Day 12 -          Distress Signal");
+            print_headline("Day 14 -       Regolith Reservoir");
             day14::run();
             day14::run2();
         }
