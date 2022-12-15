@@ -94,7 +94,7 @@ impl Board {
         let full_file = "output/".to_string() + filename;
         let path = Path::new(&full_file);
         let file = File::create(path).unwrap();
-        let ref mut w = BufWriter::new(file);
+        let w = &mut BufWriter::new(file);
 
         let mut encoder = Encoder::new(w, self.map[0].len() as u32, self.map.len() as u32);
         encoder.set_color(png::ColorType::Grayscale);

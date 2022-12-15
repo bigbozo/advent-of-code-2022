@@ -17,7 +17,7 @@ impl Pair {
         if width_at_line < 1 {
             return None;
         }
-        return Some((self.sensor.0 - width_at_line, self.sensor.0 + width_at_line));
+        Some((self.sensor.0 - width_at_line, self.sensor.0 + width_at_line))
     }
 }
 
@@ -27,18 +27,18 @@ pub fn interval_union(mut intervals: Vec<(i64, i64)>) -> Vec<(i64, i64)> {
     intervals.sort_by(|a, b| a.0.cmp(&b.0));
 
     for t in intervals.iter() {
-        if interval_union.len() == 0 {
+        if interval_union.is_empty() {
             interval_union.push(t.to_owned());
         }
         let mut found = false;
-        for i in 0..interval_union.len() {
-            let ut = interval_union[i];
+        for ut in &mut interval_union {
+
             if t.0 >= ut.0 && t.0 <= ut.1 {
-                interval_union[i].1 = max(t.1, ut.1);
+                ut.1 = max(t.1, ut.1);
                 found = true;
                 break;
             } else if t.1 <= ut.1 && t.1 >= ut.0 {
-                interval_union[i].0 = min(t.0, ut.0);
+                ut.0 = min(t.0, ut.0);
                 found = true;
                 break;
             }
@@ -50,18 +50,12 @@ pub fn interval_union(mut intervals: Vec<(i64, i64)>) -> Vec<(i64, i64)> {
     interval_union
 }
 
-fn intervals_at_line(pairs: &Vec<Pair>, line: i64) -> Vec<(i64, i64)> {
-    let intervals: Vec<Option<(i64, i64)>> = pairs
-        .into_iter()
-        .map(|pair| pair.visible_at_line(line))
-        .collect::<Vec<Option<(i64, i64)>>>();
+fn intervals_at_line(pairs: &[Pair], line: i64) -> Vec<(i64, i64)> {
+    pairs
+        .iter()
+        .filter_map(|pair| pair.visible_at_line(line))
+        .collect()
 
-    let intervals: Vec<(i64, i64)> = intervals
-        .into_iter()
-        .filter(|i| i.is_some())
-        .map(|i| i.unwrap())
-        .collect();
-    intervals
 }
 
 fn count_intervals(interval: Vec<(i64, i64)>) -> i64 {
@@ -72,12 +66,17 @@ fn count_intervals(interval: Vec<(i64, i64)>) -> i64 {
 }
 
 fn count_intervals_with_bounds(interval: Vec<(i64, i64)>, left: i64, right: i64) -> i64 {
+    let clipped = clip_intervals(interval, left, right);
+    count_intervals(clipped)
+}
+
+fn clip_intervals(interval: Vec<(i64, i64)>, left: i64, right: i64) -> Vec<(i64, i64)> {
     let clipped = interval
         .iter()
         .filter(|i| i.0 <= right && i.1 >= left)
         .map(|i| (max(i.0, left), min(i.1, right)))
         .collect::<Vec<(i64, i64)>>();
-    count_intervals(clipped)
+    clipped
 }
 
 fn parse_line(line: &str) -> Pair {
