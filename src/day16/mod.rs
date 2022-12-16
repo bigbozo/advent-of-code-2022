@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use regex::{Captures, Regex};
 use crate::read_file;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq,Clone)]
 pub struct Node {
     id: String,
     flow: u32,
@@ -10,7 +10,7 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn swap_neighbours(&mut self, a: &str, b: &str) {
+    pub fn swap_neighbours(&mut self, a: &str, b: String) {
         for i in 0..self.neighbours.len() {
             if self.neighbours[i] == a {
                 self.neighbours[i] = b.to_string();
@@ -19,11 +19,25 @@ impl Node {
     }
 }
 
-fn parse_input(input: &str) -> Vec<Node> {
-    let mut nodes: Vec<Node> = vec![];
+fn parse_input(input: &str) -> HashMap<String,Node> {
+    let mut nodes: HashMap<String,Node> = HashMap::new();
+    let mut node_ids = vec![];
+
     for line in input.lines() {
-        nodes.push(parse_line(line));
+        let node = parse_line(line);
+        node_ids.push(node.id.to_string());
+        nodes.insert(node.id.to_string(),node);
     }
+
+    for id in node_ids {
+        let mut node = nodes.get(&id).unwrap();
+        if node.flow == 0 && id != "AA" {
+            nodes.get(&node.neighbours[0]).unwrap().swap_neighbours(&id, node.neighbours[1].to_string());
+            nodes.get(&node.neighbours[1]).unwrap().swap_neighbours(&id, node.neighbours[0].to_string());
+            nodes.remove(&id);
+        }
+    }
+
     nodes
 }
 
@@ -44,19 +58,10 @@ pub fn run() {
     let mut nodes = parse_input(&read_file("input/day16.txt"));
     println!("digraph {}", "{");
 
-    let mut graph = HashMap::new();
 
-    let _ = nodes.iter_mut().map(|node| graph.insert(node.id.to_string(), node)).collect::<Vec<Option<&mut Node>>>();
 
-    for node in &mut nodes {
-        if node.flow == 0 && node.id != "AA" {
-            graph.get(&node.neighbours[0]).unwrap().swap_neighbours(&node.id, &node.neighbours[1]);
-            graph.get(&node.neighbours[1]).unwrap().swap_neighbours(&node.id, &node.neighbours[0]);
-            graph.remove(&node.id);
-        }
-    }
 
-    for (id, node) in &graph {
+    for (id, node) in &nodes {
         println!("{} [label =\"{} {}\"]", id, id, node.flow);
 
 
