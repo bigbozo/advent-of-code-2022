@@ -32,12 +32,11 @@ pub fn interval_union(mut intervals: Vec<(i64, i64)>) -> Vec<(i64, i64)> {
         }
         let mut found = false;
         for ut in &mut interval_union {
-
-            if t.0 >= ut.0 && t.0 <= ut.1 {
+            if t.0 >= ut.0 - 1 && t.0 <= ut.1 + 1 {
                 ut.1 = max(t.1, ut.1);
                 found = true;
                 break;
-            } else if t.1 <= ut.1 && t.1 >= ut.0 {
+            } else if t.1 <= ut.1 + 1 && t.1 >= ut.0 + 1 {
                 ut.0 = min(t.0, ut.0);
                 found = true;
                 break;
@@ -55,7 +54,6 @@ fn intervals_at_line(pairs: &[Pair], line: i64) -> Vec<(i64, i64)> {
         .iter()
         .filter_map(|pair| pair.visible_at_line(line))
         .collect()
-
 }
 
 fn count_intervals(interval: Vec<(i64, i64)>) -> i64 {
@@ -106,7 +104,6 @@ pub fn run() {
     println!("{} Positions cannot hold a beacon", count_intervals(interval_union(intervals)));
 }
 
-// FIXME: this is impossibly slow
 pub fn run2() {
     let pairs = parse_input(&read_file("input/day15.txt"));
     let range = 4_000_000;
@@ -122,7 +119,7 @@ pub fn run2() {
         }
     }
     let intervals = interval_union(intervals_at_line(&pairs, y));
-    println!("This is your frequency: {}",y + range * (intervals[0].1+1));
+    println!("This is your frequency: {}", y + range * (intervals[0].1 + 1));
 }
 
 #[cfg(test)]

@@ -1,4 +1,4 @@
-use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, print_headline};
+use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, print_headline};
 use clap::Parser;
 
 #[derive(Parser)]
@@ -94,6 +94,11 @@ fn run_day(day: Option<u32>) {
             print_headline("Day 15 -    Beacon Exclusion Zone");
             day15::run();
             day15::run2();
+        }
+        Some(15) => {
+            print_headline("Day 16 -    Proboscidea Volcanium");
+            day16::run();
+            day16::run2();
         }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
