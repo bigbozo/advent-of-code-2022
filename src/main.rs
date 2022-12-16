@@ -16,7 +16,7 @@ fn main() {
 fn run_day(day: Option<u32>) {
     match day {
         None => {
-            for i in 1..16 {
+            for i in 1..17 {
                 run_day(Some(i));
             }
         }
@@ -95,8 +95,8 @@ fn run_day(day: Option<u32>) {
             day15::run();
             day15::run2();
         }
-        Some(15) => {
-            print_headline("Day 16 -    Proboscidea Volcanium");
+        Some(16) => {
+            //print_headline("Day 16 -    Proboscidea Volcanium");
             day16::run();
             day16::run2();
         }

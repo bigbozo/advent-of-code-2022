@@ -1,0 +1,168 @@
+digraph {
+DJ [label ="DJ 0"]
+LP [label ="LP 0"]
+GT [label ="GT 0"]
+RO [label ="RO 5"]
+PS [label ="PS 0"]
+QV [label ="QV 0"]
+MV [label ="MV 0"]
+RN [label ="RN 0"]
+HF [label ="HF 0"]
+PY [label ="PY 19"]
+AT [label ="AT 0"]
+UY [label ="UY 3"]
+YI [label ="YI 0"]
+EB [label ="EB 8"]
+ID [label ="ID 0"]
+FY [label ="FY 15"]
+GQ [label ="GQ 0"]
+HW [label ="HW 0"]
+CQ [label ="CQ 17"]
+AW [label ="AW 20"]
+BV [label ="BV 0"]
+PB [label ="PB 0"]
+MX [label ="MX 0"]
+DE [label ="DE 4"]
+AA [label ="AA 0"]
+QN [label ="QN 23"]
+GO [label ="GO 0"]
+PZ [label ="PZ 0"]
+PG [label ="PG 0"]
+FL [label ="FL 18"]
+DS [label ="DS 0"]
+ZH [label ="ZH 11"]
+KV [label ="KV 0"]
+UV [label ="UV 9"]
+WH [label ="WH 0"]
+FD [label ="FD 0"]
+FJ [label ="FJ 24"]
+JT [label ="JT 0"]
+SN [label ="SN 0"]
+KM [label ="KM 0"]
+LQ [label ="LQ 0"]
+NO [label ="NO 0"]
+SB [label ="SB 0"]
+MK [label ="MK 25"]
+YG [label ="YG 0"]
+IJ [label ="IJ 16"]
+EP [label ="EP 0"]
+MM [label ="MM 0"]
+YQ [label ="YQ 0"]
+EE [label ="EE 0"]
+DJ -> ZH
+DJ -> AA
+LP -> AA
+LP -> EE
+GT -> FJ
+GT -> AW
+RO -> NO
+RO -> FD
+RO -> QV
+RO -> BV
+PS -> FY
+PS -> UV
+QV -> EB
+QV -> RO
+MV -> FL
+MV -> EB
+RN -> AW
+RN -> LQ
+HF -> QN
+HF -> HW
+PY -> SN
+AT -> YQ
+AT -> UY
+UY -> KV
+UY -> ID
+UY -> AT
+UY -> PB
+UY -> PG
+YI -> FL
+YI -> FD
+EB -> MV
+EB -> GQ
+EB -> QV
+ID -> NO
+ID -> UY
+FY -> LQ
+FY -> PS
+GQ -> EB
+GQ -> KM
+HW -> FJ
+HW -> HF
+CQ -> KM
+CQ -> GO
+AW -> RN
+AW -> GT
+AW -> WH
+AW -> MX
+BV -> RO
+BV -> ZH
+PB -> UY
+PB -> AA
+MX -> AW
+MX -> YG
+DE -> MM
+DE -> PZ
+DE -> PG
+DE -> DS
+DE -> EP
+AA -> EP
+AA -> PB
+AA -> LP
+AA -> AW
+AA -> DJ
+QN -> SN
+QN -> HF
+GO -> CQ
+GO -> MK
+PZ -> IJ
+PZ -> DE
+PG -> UY
+PG -> DE
+FL -> MV
+FL -> YI
+DS -> DE
+DS -> ZH
+ZH -> YQ
+ZH -> BV
+ZH -> DJ
+ZH -> DS
+ZH -> SB
+KV -> UY
+KV -> IJ
+UV -> MM
+UV -> PS
+UV -> YG
+WH -> AW
+WH -> AW
+FD -> YI
+FD -> RO
+FJ -> HW
+FJ -> GT
+SN -> PY
+SN -> QN
+KM -> GQ
+KM -> CQ
+LQ -> RN
+LQ -> FY
+NO -> ID
+NO -> RO
+SB -> ZH
+SB -> IJ
+MK -> GO
+YG -> MX
+YG -> UV
+IJ -> EE
+IJ -> KV
+IJ -> PZ
+IJ -> SB
+EP -> AA
+EP -> DE
+MM -> UV
+MM -> DE
+YQ -> AT
+YQ -> ZH
+EE -> LP
+EE -> IJ
+}
