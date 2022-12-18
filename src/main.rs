@@ -1,4 +1,4 @@
-use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, print_headline};
+use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, print_headline};
 use clap::Parser;
 
 #[derive(Parser)]
@@ -16,8 +16,12 @@ fn main() {
 fn run_day(day: Option<u32>) {
     match day {
         None => {
-            for i in 1..17 {
-                run_day(Some(i));
+            for i in 1..18 {
+                if i!=16 {
+                    run_day(Some(i));
+                } else {
+                    println!("Day 16 only solo, too long");
+                }
             }
         }
         Some(1) => {
@@ -96,7 +100,7 @@ fn run_day(day: Option<u32>) {
             day15::run2();
         }
         Some(16) => {
-            //print_headline("Day 16 -    Proboscidea Volcanium");
+            print_headline("Day 16 -    Proboscidea Volcanium");
             day16::run();
             day16::run2();
         }
