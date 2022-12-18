@@ -104,6 +104,11 @@ fn run_day(day: Option<u32>) {
             day16::run();
             day16::run2();
         }
+        Some(17) => {
+            print_headline("Day 17 -    Pyroclastic Flow");
+            day17::run();
+            day17::run2();
+        }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
 }
