@@ -1,5 +1,4 @@
 use std::fmt::{Display, Formatter};
-use crate::read_file;
 
 struct Board {
     rows: Vec<u8>,

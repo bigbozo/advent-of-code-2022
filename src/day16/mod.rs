@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
+use std::fs::File;
+use std::io::{Write, Error};
 use regex::{Captures, Regex};
 use crate::day16::Action::{Valve, Walk};
 use crate::read_file;
@@ -53,14 +55,16 @@ impl Node {
         }
     }
 }
+
 impl Debug for Node {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{}, F:{}, {:?}]", make_node_string(self.id),self.flow,self.neighbours)
+        write!(f, "[{}, F:{}, {:?}]", make_node_string(self.id), self.flow, self.neighbours)
     }
 }
+
 impl Debug for Edge {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{},{}]", make_node_string(self.to),self.weight)
+        write!(f, "[{},{}]", make_node_string(self.to), self.weight)
     }
 }
 
@@ -168,6 +172,28 @@ pub fn run() {
             Walk(from_id, node_id, weight) => { println!("Walk from {} to {} (Costs: {})", make_node_string(from_id), make_node_string(node_id), weight) }
         }
     }
+
+    generate_dot_file(&nodes).expect("Couldnt write file");
+}
+
+fn generate_dot_file(nodes: &HashMap<NodeId, Node>) -> Result<(), Error> {
+    let path = "output/day16.dot";
+
+    let mut output = File::create(path)?;
+
+    writeln!(output, "digraph {}", "{")?;
+
+
+    for (id, node) in nodes {
+        writeln!(output, "{} [label =\"{} {}\"]", make_node_string(*id), make_node_string(*id), node.flow)?;
+
+        for neighbour in &node.neighbours {
+            writeln!(output, "{} -> {} [label = {}]", make_node_string(*id), make_node_string(neighbour.to), neighbour.weight)?;
+        }
+    }
+    writeln!(output, "{}", "}")?;
+
+    Ok(())
 }
 
 fn make_node_string(p0: NodeId) -> String {
@@ -192,7 +218,6 @@ mod test {
     fn parses_input() {
         let mut nodes = parse_input(&read_file("input/day16-test.txt"));
 
-        let score = walk(&mut nodes, make_id("AA"), 0, 30,0);
-
+        let score = walk(&mut nodes, make_id("AA"), 0, 30, 0);
     }
 }

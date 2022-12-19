@@ -1,5 +1,6 @@
-use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, print_headline};
+use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, day18, print_headline};
 use clap::Parser;
+use adventofcode::day14::run;
 
 #[derive(Parser)]
 struct Cli {
@@ -10,15 +11,15 @@ struct Cli {
 fn main() {
     let args = Cli::parse();
 
-    run_day(args.day);
+    run_day(args.day, false);
 }
 
-fn run_day(day: Option<u32>) {
+fn run_day(day: Option<u32>, run_all: bool) {
     match day {
         None => {
-            for i in 1..18 {
+            for i in 1..19 {
                 if i!=16 {
-                    run_day(Some(i));
+                    run_day(Some(i),true);
                 } else {
                     println!("Day 16 only solo, too long");
                 }
@@ -97,7 +98,11 @@ fn run_day(day: Option<u32>) {
         Some(15) => {
             print_headline("Day 15 -    Beacon Exclusion Zone");
             day15::run();
-            day15::run2();
+            if !run_all {
+                day15::run2();
+            } else {
+                println!("Takes too long! Start day 15");
+            }
         }
         Some(16) => {
             print_headline("Day 16 -    Proboscidea Volcanium");
@@ -105,9 +110,18 @@ fn run_day(day: Option<u32>) {
             day16::run2();
         }
         Some(17) => {
-            print_headline("Day 17 -    Pyroclastic Flow");
+            print_headline("Day 17 -         Pyroclastic Flow");
             day17::run();
-            day17::run2();
+            if !run_all {
+                day17::run2();
+            } else {
+                println!("Takes too long! Start day 17");
+            }
+        }
+        Some(18) => {
+            print_headline("Day 18 -         Boiling Boulders");
+            day18::run();
+            day18::run2();
         }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
