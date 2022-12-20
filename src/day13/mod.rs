@@ -1,6 +1,6 @@
-use crate::read_file;
 use crate::day13::ListItem::{ItemList, Value};
 use crate::day13::ParseMode::{FindItems, FindRight};
+use crate::read_file;
 use std::cmp::Ordering;
 
 #[derive(Debug, Eq)]
@@ -146,7 +146,9 @@ pub fn run2() {
         .find(|(_i, item)| ItemList(vec![ItemList(vec![Value(6)])]) == **item)
         .unwrap();
 
-    println!("This is the Decoder key: {}", { (marker1.0 + 1) * (marker2.0 + 1) });
+    println!("This is the Decoder key: {}", {
+        (marker1.0 + 1) * (marker2.0 + 1)
+    });
 }
 
 #[cfg(test)]
@@ -192,6 +194,4 @@ mod test {
     fn less_than() {
         assert_eq!(true, parse_list("[1]") < parse_list("[2]"));
     }
-
-
 }

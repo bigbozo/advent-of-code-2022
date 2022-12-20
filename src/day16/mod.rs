@@ -1,10 +1,10 @@
+use crate::day16::Action::{Valve, Walk};
+use crate::read_file;
+use regex::{Captures, Regex};
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::fs::File;
-use std::io::{Write, Error};
-use regex::{Captures, Regex};
-use crate::day16::Action::{Valve, Walk};
-use crate::read_file;
+use std::io::{Error, Write};
 
 #[derive(PartialEq, Copy, Clone)]
 pub struct Edge {
@@ -24,7 +24,6 @@ pub struct Node {
     valve_open: bool,
     neighbours: Vec<Edge>,
 }
-
 
 type NodeId = u32;
 
@@ -58,7 +57,13 @@ impl Node {
 
 impl Debug for Node {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{}, F:{}, {:?}]", make_node_string(self.id), self.flow, self.neighbours)
+        write!(
+            f,
+            "[{}, F:{}, {:?}]",
+            make_node_string(self.id),
+            self.flow,
+            self.neighbours
+        )
     }
 }
 
@@ -85,8 +90,12 @@ fn parse_input(input: &str) -> HashMap<NodeId, Node> {
             let y = node.neighbours[1].to;
             let weight = node.neighbours[0].weight + node.neighbours[1].weight;
             nodes.remove(&id);
-            nodes.entry(x).and_modify(|node| node.swap_neighbours(id, y, weight));
-            nodes.entry(y).and_modify(|node| node.swap_neighbours(id, x, weight));
+            nodes
+                .entry(x)
+                .and_modify(|node| node.swap_neighbours(id, y, weight));
+            nodes
+                .entry(y)
+                .and_modify(|node| node.swap_neighbours(id, x, weight));
         }
     }
 
@@ -94,19 +103,32 @@ fn parse_input(input: &str) -> HashMap<NodeId, Node> {
 }
 
 pub fn parse_line(input: &str) -> Node {
-    let regex = Regex::new(r"Valve ([A-Z][A-Z]) has flow rate=(\d+); tunnels? leads? to valves? (.*)$").unwrap();
+    let regex =
+        Regex::new(r"Valve ([A-Z][A-Z]) has flow rate=(\d+); tunnels? leads? to valves? (.*)$")
+            .unwrap();
 
-    let cap: Captures = regex.captures(input)
-        .unwrap();
+    let cap: Captures = regex.captures(input).unwrap();
 
     Node::new(
         make_id(&cap[1]),
         cap[2].parse().unwrap(),
-        cap[3].split(", ").map(|c| Edge { to: make_id(c), weight: 1 }).collect(),
+        cap[3]
+            .split(", ")
+            .map(|c| Edge {
+                to: make_id(c),
+                weight: 1,
+            })
+            .collect(),
     )
 }
 
-fn walk(nodes: &mut HashMap<NodeId, Node>, current_node: NodeId, previous_node: NodeId, steps: u32, open_valves: u32) -> (u32, Vec<Action>) {
+fn walk(
+    nodes: &mut HashMap<NodeId, Node>,
+    current_node: NodeId,
+    previous_node: NodeId,
+    steps: u32,
+    open_valves: u32,
+) -> (u32, Vec<Action>) {
     if steps < 1 {
         return (0, vec![]);
     }
@@ -120,23 +142,33 @@ fn walk(nodes: &mut HashMap<NodeId, Node>, current_node: NodeId, previous_node: 
     let mut best_steps: Vec<Action> = vec![];
 
     if !nodes.get(&current_node).unwrap().valve_open {
-        nodes.entry(current_node).and_modify(|node| node.valve_open = true);
+        nodes
+            .entry(current_node)
+            .and_modify(|node| node.valve_open = true);
         let node = nodes.get(&current_node).unwrap();
         let score = node.flow * (steps - 1);
         let neighbours = node.neighbours.clone();
         for neighbour in neighbours {
             // makes only sense if we can walk AND open the valve AND there's still time after
             if steps > 1 + neighbour.weight {
-                let (score, done_steps) = walk(nodes, neighbour.to, 0, steps - 1 - neighbour.weight, open_valves + 1);
+                let (score, done_steps) = walk(
+                    nodes,
+                    neighbour.to,
+                    0,
+                    steps - 1 - neighbour.weight,
+                    open_valves + 1,
+                );
                 if score > max_score {
                     best_steps = done_steps;
-                    best_steps.push(Valve(current_node));
                     best_steps.push(Walk(current_node, neighbour.to, neighbour.weight));
+                    best_steps.push(Valve(current_node));
                     max_score = score;
                 }
             }
         }
-        nodes.entry(current_node).and_modify(|node| node.valve_open = false);
+        nodes
+            .entry(current_node)
+            .and_modify(|node| node.valve_open = false);
         max_score += score;
     }
 
@@ -146,7 +178,13 @@ fn walk(nodes: &mut HashMap<NodeId, Node>, current_node: NodeId, previous_node: 
         if neighbour.to != previous_node {
             // makes only sense if we can walk AND open the valve AND there's still time after
             if steps > 1 + neighbour.weight {
-                let (score, done_steps) = walk(nodes, neighbour.to, current_node, steps - neighbour.weight, open_valves);
+                let (score, done_steps) = walk(
+                    nodes,
+                    neighbour.to,
+                    current_node,
+                    steps - neighbour.weight,
+                    open_valves,
+                );
                 if score > max_score {
                     best_steps = done_steps;
                     best_steps.push(Walk(current_node, neighbour.to, neighbour.weight));
@@ -168,8 +206,17 @@ pub fn run() {
     println!("Here, take that score: {}\n", score);
     for s in steps {
         match s {
-            Valve(node_id) => { println!("Open valve: {}", make_node_string(node_id)) }
-            Walk(from_id, node_id, weight) => { println!("Walk from {} to {} (Costs: {})", make_node_string(from_id), make_node_string(node_id), weight) }
+            Valve(node_id) => {
+                println!("Open valve: {}", make_node_string(node_id))
+            }
+            Walk(from_id, node_id, weight) => {
+                println!(
+                    "Walk from {} to {} (Costs: {})",
+                    make_node_string(from_id),
+                    make_node_string(node_id),
+                    weight
+                )
+            }
         }
     }
 
@@ -183,12 +230,23 @@ fn generate_dot_file(nodes: &HashMap<NodeId, Node>) -> Result<(), Error> {
 
     writeln!(output, "digraph {}", "{")?;
 
-
     for (id, node) in nodes {
-        writeln!(output, "{} [label =\"{} {}\"]", make_node_string(*id), make_node_string(*id), node.flow)?;
+        writeln!(
+            output,
+            "{} [label =\"{} {}\"]",
+            make_node_string(*id),
+            make_node_string(*id),
+            node.flow
+        )?;
 
         for neighbour in &node.neighbours {
-            writeln!(output, "{} -> {} [label = {}]", make_node_string(*id), make_node_string(neighbour.to), neighbour.weight)?;
+            writeln!(
+                output,
+                "{} -> {} [label = {}]",
+                make_node_string(*id),
+                make_node_string(neighbour.to),
+                neighbour.weight
+            )?;
         }
     }
     writeln!(output, "{}", "}")?;
@@ -197,7 +255,10 @@ fn generate_dot_file(nodes: &HashMap<NodeId, Node>) -> Result<(), Error> {
 }
 
 fn make_node_string(p0: NodeId) -> String {
-    [char::from_u32(p0 / 256), char::from_u32(p0 % 256)].into_iter().flatten().collect::<String>()
+    [char::from_u32(p0 / 256), char::from_u32(p0 % 256)]
+        .into_iter()
+        .flatten()
+        .collect::<String>()
 }
 
 pub fn run2() {
@@ -206,8 +267,8 @@ pub fn run2() {
 
 #[cfg(test)]
 mod test {
-    use crate::read_file;
     use super::*;
+    use crate::read_file;
 
     #[test]
     fn parses_line() {

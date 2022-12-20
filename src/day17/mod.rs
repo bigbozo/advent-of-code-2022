@@ -10,7 +10,6 @@ struct Piece {
     pub rows: Vec<u8>,
 }
 
-
 impl Board {
     pub fn new() -> Board {
         Board {
@@ -38,42 +37,39 @@ impl Board {
         for (i, piece_line) in piece.rows.iter().enumerate() {
             self.rows[row - i] = self.rows[row - i] | piece_line;
             cutoff = cutoff | self.rows[row - i];
-
         }
 
         while self.rows[self.rows.len() - 1] == 0 {
             self.rows.pop();
         }
-        if self.rows.len()>10000 {
+        if self.rows.len() > 10000 {
             self.rows.drain(..9000);
-            self.base_height+=9000;
+            self.base_height += 9000;
         }
     }
 }
 
 impl Display for Board {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.rows
-            .iter()
-            .map(|row|
-                format!("{:b}", row + 128)
-            )
-            .collect::<Vec<String>>().join("\n"))
+        write!(
+            f,
+            "{}",
+            self.rows
+                .iter()
+                .map(|row| format!("{:b}", row + 128))
+                .collect::<Vec<String>>()
+                .join("\n")
+        )
     }
 }
 
-
 impl Piece {
     pub fn new(rows: Vec<u8>) -> Piece {
-        Piece {
-            rows
-        }
+        Piece { rows }
     }
 
     pub fn copy(piece: &Piece) -> Piece {
-        let mut new_piece = Piece {
-            rows: vec![]
-        };
+        let mut new_piece = Piece { rows: vec![] };
         for i in 0..piece.rows.len() {
             new_piece.rows.push(piece.rows[i]);
         }
@@ -118,29 +114,11 @@ pub fn get_move(move_number: usize) -> char {
 pub fn run() {
     let mut board = Board::new();
     let pieces: Vec<Piece> = vec![
-        Piece::new(vec![
-            0b0011110
-        ]),
-        Piece::new(vec![
-            0b0001000,
-            0b0011100,
-            0b0001000,
-        ]),
-        Piece::new(vec![
-            0b0000100,
-            0b0000100,
-            0b0011100,
-        ]),
-        Piece::new(vec![
-            0b0010000,
-            0b0010000,
-            0b0010000,
-            0b0010000,
-        ]),
-        Piece::new(vec![
-            0b0011000,
-            0b0011000,
-        ]),
+        Piece::new(vec![0b0011110]),
+        Piece::new(vec![0b0001000, 0b0011100, 0b0001000]),
+        Piece::new(vec![0b0000100, 0b0000100, 0b0011100]),
+        Piece::new(vec![0b0010000, 0b0010000, 0b0010000, 0b0010000]),
+        Piece::new(vec![0b0011000, 0b0011000]),
     ];
 
     let mut current_block_type: usize = 0;
@@ -180,7 +158,10 @@ pub fn run() {
                 _ => {}
             }
             // if can fall down
-            if current_position < rock.rows.len() - 1 || (current_position > rock.rows.len() - 1 && !board.overlapping(&rock, current_position - 1)) {
+            if current_position < rock.rows.len() - 1
+                || (current_position > rock.rows.len() - 1
+                    && !board.overlapping(&rock, current_position - 1))
+            {
                 // fall down: decrease rock-y
                 current_position -= 1;
             } else {
@@ -202,29 +183,11 @@ pub fn run() {
 pub fn run2() {
     let mut board = Board::new();
     let pieces: Vec<Piece> = vec![
-        Piece::new(vec![
-            0b0011110
-        ]),
-        Piece::new(vec![
-            0b0001000,
-            0b0011100,
-            0b0001000,
-        ]),
-        Piece::new(vec![
-            0b0000100,
-            0b0000100,
-            0b0011100,
-        ]),
-        Piece::new(vec![
-            0b0010000,
-            0b0010000,
-            0b0010000,
-            0b0010000,
-        ]),
-        Piece::new(vec![
-            0b0011000,
-            0b0011000,
-        ]),
+        Piece::new(vec![0b0011110]),
+        Piece::new(vec![0b0001000, 0b0011100, 0b0001000]),
+        Piece::new(vec![0b0000100, 0b0000100, 0b0011100]),
+        Piece::new(vec![0b0010000, 0b0010000, 0b0010000, 0b0010000]),
+        Piece::new(vec![0b0011000, 0b0011000]),
     ];
 
     let mut current_block_type: usize = 0;
@@ -265,10 +228,9 @@ pub fn run2() {
             }
             // if can fall down
             if current_position < rock.rows.len() - 1
-                || (
-                current_position > rock.rows.len() - 1
-                    && !board.overlapping(&rock, current_position - 1)
-            ) {
+                || (current_position > rock.rows.len() - 1
+                    && !board.overlapping(&rock, current_position - 1))
+            {
                 // fall down: decrease rock-y
                 current_position -= 1;
             } else {

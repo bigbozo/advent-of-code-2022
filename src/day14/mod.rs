@@ -1,13 +1,12 @@
+use crate::read_file;
+use crate::Point;
+use itertools::Itertools;
+use png::Encoder;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
-use itertools::Itertools;
-use png::Encoder;
-use crate::Point;
-use crate::read_file;
-
 
 type Points = Vec<Point<i32>>;
 
@@ -37,9 +36,7 @@ struct Ruleset {
 
 impl Ruleset {
     pub fn new(items: Vec<Rules>) -> Ruleset {
-        Ruleset {
-            items
-        }
+        Ruleset { items }
     }
 
     fn max_x(&self) -> Option<i32> {
@@ -55,7 +52,6 @@ impl Ruleset {
         self.items.iter().map(|rules| rules.min_y()).min()?
     }
 }
-
 
 struct Board {
     map: Vec<Vec<char>>,
@@ -79,15 +75,21 @@ impl Board {
         let ox = (x - self.offset.x) as usize;
         let oy = y as usize;
 
-
         ox >= self.map[0].len() || oy >= self.map.len()
     }
 
     pub fn count_sand(&self) -> usize {
-        self.map.iter().map(|row| row.iter().map(|cell| match cell {
-            'o' => 1,
-            _ => 0
-        }).sum::<usize>()).sum()
+        self.map
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|cell| match cell {
+                        'o' => 1,
+                        _ => 0,
+                    })
+                    .sum::<usize>()
+            })
+            .sum()
     }
 
     pub fn save_png(&self, filename: &str) {
@@ -100,7 +102,12 @@ impl Board {
         encoder.set_color(png::ColorType::Grayscale);
         let mut writer = encoder.write_header().unwrap();
 
-        let data: Vec<u8> = self.map.iter().map(|row| row.iter().map(|cell| *cell as u8).collect::<Vec<u8>>()).collect::<Vec<Vec<u8>>>().concat();
+        let data: Vec<u8> = self
+            .map
+            .iter()
+            .map(|row| row.iter().map(|cell| *cell as u8).collect::<Vec<u8>>())
+            .collect::<Vec<Vec<u8>>>()
+            .concat();
 
         writer.write_image_data(&data).unwrap();
     }
@@ -108,7 +115,14 @@ impl Board {
 
 impl Display for Board {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.map.iter().map(|row| row.iter().collect::<String>()).join("\n"))
+        write!(
+            f,
+            "{}",
+            self.map
+                .iter()
+                .map(|row| row.iter().collect::<String>())
+                .join("\n")
+        )
     }
 }
 
@@ -117,10 +131,16 @@ fn parse_input(input: String) -> Vec<Rules> {
 
     for line in input.lines() {
         let rules: Rules = Rules {
-            points: line.split(" -> ").map(|coordinate| {
-                let (x, y) = coordinate.split_once(',').unwrap();
-                Point { x: x.parse().unwrap(), y: y.parse().unwrap() }
-            }).collect::<Points>()
+            points: line
+                .split(" -> ")
+                .map(|coordinate| {
+                    let (x, y) = coordinate.split_once(',').unwrap();
+                    Point {
+                        x: x.parse().unwrap(),
+                        y: y.parse().unwrap(),
+                    }
+                })
+                .collect::<Points>(),
         };
         ruleset.push(rules);
     }
@@ -141,7 +161,6 @@ fn create_board(ruleset: Ruleset) -> Option<Board> {
         offset: Point { x, y },
     };
 
-
     for rules in ruleset.items {
         for i in 0..rules.points.len() - 1 {
             let cursor = rules.points[i];
@@ -158,19 +177,17 @@ fn paint_line(board: &mut Board, from: Point<i32>, to: Point<i32>) {
         Ordering::Less => {
             paint_horizontal_line(board, from.x, to.x, from.y);
         }
-        Ordering::Equal => {
-            match from.y.cmp(&to.y) {
-                Ordering::Less => {
-                    paint_vertical_line(board, from.x, from.y, to.y);
-                }
-                Ordering::Equal => {
-                    board.set(from.x, from.y, '#');
-                }
-                Ordering::Greater => {
-                    paint_vertical_line(board, from.x, to.y, from.y);
-                }
+        Ordering::Equal => match from.y.cmp(&to.y) {
+            Ordering::Less => {
+                paint_vertical_line(board, from.x, from.y, to.y);
             }
-        }
+            Ordering::Equal => {
+                board.set(from.x, from.y, '#');
+            }
+            Ordering::Greater => {
+                paint_vertical_line(board, from.x, to.y, from.y);
+            }
+        },
         Ordering::Greater => {
             paint_horizontal_line(board, to.x, from.x, from.y);
         }
@@ -193,10 +210,10 @@ fn run_simulation(board: &mut Board) {
     let mut cx = 500;
     let mut cy = 0;
 
-
     loop {
         cy += 1;
-        if board.get(cx, cy) == '.' {} else if board.get(cx - 1, cy) == '.' {
+        if board.get(cx, cy) == '.' {
+        } else if board.get(cx - 1, cy) == '.' {
             cx -= 1;
         } else if board.get(cx + 1, cy) == '.' {
             cx += 1;
@@ -215,14 +232,12 @@ fn run_simulation(board: &mut Board) {
     }
 }
 
-
 pub fn run() {
     let board = create_board(Ruleset::new(parse_input(read_file("input/day14.txt"))));
 
     let mut board = board.unwrap();
 
     run_simulation(&mut board);
-
 
     println!("{} units sand are collected!", board.count_sand());
     println!("I painted a nice picture for you (output/day14-a.png)");
@@ -233,7 +248,12 @@ pub fn run() {
 pub fn run2() {
     let mut ruleset = Ruleset::new(parse_input(read_file("input/day14.txt")));
     let y = ruleset.max_y().unwrap();
-    ruleset.items.push(Rules { points: vec![Point::new(500 - y - 2, y + 2), Point::new(500 + y + 2, y + 2)] });
+    ruleset.items.push(Rules {
+        points: vec![
+            Point::new(500 - y - 2, y + 2),
+            Point::new(500 + y + 2, y + 2),
+        ],
+    });
     let mut board = create_board(ruleset).unwrap();
     run_simulation(&mut board);
 
@@ -248,18 +268,40 @@ mod test {
 
     #[test]
     fn parses_lines() {
-        assert_eq!(vec![
-            Rules { points: vec![Point::new(1, 1), Point::new(2, 2)] }
-        ], parse_input("1,1 -> 2,2".to_string()));
-        assert_eq!(vec![
-            Rules { points: vec![Point::new(498, 4), Point::new(498, 6), Point::new(496, 6)] },
-            Rules { points: vec![Point::new(503, 4), Point::new(502, 4), Point::new(502, 9), Point::new(494, 9)] },
-        ], parse_input(read_file("input/day14-test.txt")));
+        assert_eq!(
+            vec![Rules {
+                points: vec![Point::new(1, 1), Point::new(2, 2)]
+            }],
+            parse_input("1,1 -> 2,2".to_string())
+        );
+        assert_eq!(
+            vec![
+                Rules {
+                    points: vec![Point::new(498, 4), Point::new(498, 6), Point::new(496, 6)]
+                },
+                Rules {
+                    points: vec![
+                        Point::new(503, 4),
+                        Point::new(502, 4),
+                        Point::new(502, 9),
+                        Point::new(494, 9)
+                    ]
+                },
+            ],
+            parse_input(read_file("input/day14-test.txt"))
+        );
     }
 
     #[test]
     fn max_min_works() {
-        let rules = Rules { points: vec![Point::new(503, 4), Point::new(502, 4), Point::new(502, 9), Point::new(494, 9)] };
+        let rules = Rules {
+            points: vec![
+                Point::new(503, 4),
+                Point::new(502, 4),
+                Point::new(502, 9),
+                Point::new(494, 9),
+            ],
+        };
         assert_eq!(Some(503), rules.max_x());
         assert_eq!(Some(494), rules.min_x());
         assert_eq!(Some(9), rules.max_y());
@@ -267,9 +309,18 @@ mod test {
 
         let ruleset = Ruleset {
             items: vec![
-                Rules { points: vec![Point::new(498, 4), Point::new(498, 6), Point::new(496, 6)] },
-                Rules { points: vec![Point::new(503, 4), Point::new(502, 4), Point::new(502, 9), Point::new(494, 9)] },
-            ]
+                Rules {
+                    points: vec![Point::new(498, 4), Point::new(498, 6), Point::new(496, 6)],
+                },
+                Rules {
+                    points: vec![
+                        Point::new(503, 4),
+                        Point::new(502, 4),
+                        Point::new(502, 9),
+                        Point::new(494, 9),
+                    ],
+                },
+            ],
         };
         assert_eq!(Some(503), ruleset.max_x());
         assert_eq!(Some(494), ruleset.min_x());
@@ -284,7 +335,8 @@ mod test {
         let board = board.unwrap();
 
         println!("{}", &board);
-        assert_eq!("..........
+        assert_eq!(
+            "..........
 ..........
 ..........
 ..........
@@ -293,7 +345,9 @@ mod test {
 ..###...#.
 ........#.
 ........#.
-#########.", format!("{}", &board));
+#########.",
+            format!("{}", &board)
+        );
     }
 
     #[test]
@@ -305,7 +359,8 @@ mod test {
         run_simulation(&mut board);
 
         println!("{}", &board);
-        assert_eq!("..........
+        assert_eq!(
+            "..........
 ..........
 ......o...
 .....ooo..
@@ -314,7 +369,9 @@ mod test {
 ..###ooo#.
 ....oooo#.
 .o.ooooo#.
-#########.", format!("{}", &board));
+#########.",
+            format!("{}", &board)
+        );
     }
 
     #[test]
@@ -334,7 +391,12 @@ mod test {
     fn part2_works() {
         let mut ruleset = Ruleset::new(parse_input(read_file("input/day14-test.txt")));
         let y = ruleset.max_y().unwrap();
-        ruleset.items.push(Rules { points: vec![Point::new(500 - y - 2, y + 2), Point::new(500 + y + 2, y + 2)] });
+        ruleset.items.push(Rules {
+            points: vec![
+                Point::new(500 - y - 2, y + 2),
+                Point::new(500 + y + 2, y + 2),
+            ],
+        });
         let mut board = create_board(ruleset).unwrap();
         run_simulation(&mut board);
 

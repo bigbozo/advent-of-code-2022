@@ -1,6 +1,6 @@
 use crate::read_file;
-use std::cmp::{max, min};
 use regex::Regex;
+use std::cmp::{max, min};
 
 #[derive(Debug, PartialEq)]
 struct Pair {
@@ -57,10 +57,7 @@ fn intervals_at_line(pairs: &[Pair], line: i64) -> Vec<(i64, i64)> {
 }
 
 fn count_intervals(interval: Vec<(i64, i64)>) -> i64 {
-    interval
-        .iter()
-        .map(|i| i.1 - i.0 + 1)
-        .sum()
+    interval.iter().map(|i| i.1 - i.0 + 1).sum()
 }
 
 fn count_intervals_with_bounds(interval: Vec<(i64, i64)>, left: i64, right: i64) -> i64 {
@@ -78,30 +75,41 @@ fn clip_intervals(interval: Vec<(i64, i64)>, left: i64, right: i64) -> Vec<(i64,
 }
 
 fn parse_line(line: &str) -> Pair {
-    let regex = Regex::new(r"Sensor at x=([\d-]+), y=([\d-]+): closest beacon is at x=([\d-]+), y=([\d-]+)").unwrap();
+    let regex = Regex::new(
+        r"Sensor at x=([\d-]+), y=([\d-]+): closest beacon is at x=([\d-]+), y=([\d-]+)",
+    )
+    .unwrap();
     let cap = regex.captures(line).unwrap();
 
     Pair {
-        sensor: (cap[1].parse::<i64>().unwrap(), cap[2].parse::<i64>().unwrap()),
-        beacon: (cap[3].parse::<i64>().unwrap(), cap[4].parse::<i64>().unwrap()),
+        sensor: (
+            cap[1].parse::<i64>().unwrap(),
+            cap[2].parse::<i64>().unwrap(),
+        ),
+        beacon: (
+            cap[3].parse::<i64>().unwrap(),
+            cap[4].parse::<i64>().unwrap(),
+        ),
     }
 }
 
 fn parse_input(input: &str) -> Vec<Pair> {
-    let mut pairs: Vec<Pair> = vec!();
+    let mut pairs: Vec<Pair> = vec![];
     for line in input.lines() {
         pairs.push(parse_line(line));
     }
     pairs
 }
 
-
 pub fn run() {
     let pairs = parse_input(&read_file("input/day15.txt"));
 
     let intervals = intervals_at_line(&pairs, 2_000_000);
 
-    println!("{} Positions cannot hold a beacon", count_intervals(interval_union(intervals)));
+    println!(
+        "{} Positions cannot hold a beacon",
+        count_intervals(interval_union(intervals))
+    );
 }
 
 pub fn run2() {
@@ -119,7 +127,10 @@ pub fn run2() {
         }
     }
     let intervals = interval_union(intervals_at_line(&pairs, y));
-    println!("This is your frequency: {}", y + range * (intervals[0].1 + 1));
+    println!(
+        "This is your frequency: {}",
+        y + range * (intervals[0].1 + 1)
+    );
 }
 
 #[cfg(test)]
@@ -128,13 +139,33 @@ mod test {
 
     #[test]
     pub fn parses_line() {
-        assert_eq!(Pair { sensor: (1, 2), beacon: (-3, 4) }, parse_line("Sensor at x=1, y=2: closest beacon is at x=-3, y=4"));
+        assert_eq!(
+            Pair {
+                sensor: (1, 2),
+                beacon: (-3, 4)
+            },
+            parse_line("Sensor at x=1, y=2: closest beacon is at x=-3, y=4")
+        );
     }
 
     #[test]
     pub fn parses_input() {
-        assert_eq!(vec![Pair { sensor: (2, 18), beacon: (-2, 15) }, Pair { sensor: (9, 16), beacon: (10, 16) }], parse_input("Sensor at x=2, y=18: closest beacon is at x=-2, y=15
-Sensor at x=9, y=16: closest beacon is at x=10, y=16"))
+        assert_eq!(
+            vec![
+                Pair {
+                    sensor: (2, 18),
+                    beacon: (-2, 15)
+                },
+                Pair {
+                    sensor: (9, 16),
+                    beacon: (10, 16)
+                }
+            ],
+            parse_input(
+                "Sensor at x=2, y=18: closest beacon is at x=-2, y=15
+Sensor at x=9, y=16: closest beacon is at x=10, y=16"
+            )
+        )
     }
 
     #[test]

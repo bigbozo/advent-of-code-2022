@@ -1,6 +1,6 @@
+use crate::read_file;
 use std::fmt;
 use std::fmt::Debug;
-use crate::read_file;
 
 #[derive(Debug)]
 struct Voxel {
@@ -34,15 +34,23 @@ impl Debug for SpaceVoxel {
 impl Debug for Space {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut space = vec![];
-        space.push(format!("Width: {}/Height: {}/Depth: {}", self.width, self.height, self.depth));
+        space.push(format!(
+            "Width: {}/Height: {}/Depth: {}",
+            self.width, self.height, self.depth
+        ));
         for z in 0..self.depth {
             for y in 0..self.height {
                 let mut row = vec![];
                 for x in 0..self.width {
-                    row.push(match self.get_visited(x + self.x, y + self.y, z + self.z).unwrap() {
-                        true => '#',
-                        false => '.'
-                    });
+                    row.push(
+                        match self
+                            .get_visited(x + self.x, y + self.y, z + self.z)
+                            .unwrap()
+                        {
+                            true => '#',
+                            false => '.',
+                        },
+                    );
                 }
                 space.push(row.into_iter().collect::<String>())
             }
@@ -52,7 +60,6 @@ impl Debug for Space {
         write!(f, "{}", space.join("\n"))
     }
 }
-
 
 impl SpaceVoxel {
     pub fn new() -> SpaceVoxel {
@@ -100,28 +107,24 @@ impl Space {
     }
 
     pub fn coordinates_valid(&self, x: i32, y: i32, z: i32) -> bool {
-        x >= self.x && x < self.x + self.width
-            && y >= self.y && y < self.y + self.height
-            && z >= self.z && z < self.z + self.depth
+        x >= self.x
+            && x < self.x + self.width
+            && y >= self.y
+            && y < self.y + self.height
+            && z >= self.z
+            && z < self.z + self.depth
     }
 }
 
 impl Voxel {
     pub fn new(x: i32, y: i32, z: i32) -> Voxel {
-        Voxel {
-            x,
-            y,
-            z,
-        }
+        Voxel { x, y, z }
     }
 
     pub fn manhatten(&self, other: &Voxel) -> i32 {
-        (self.x - other.x).abs() +
-            (self.y - other.y).abs() +
-            (self.z - other.z).abs()
+        (self.x - other.x).abs() + (self.y - other.y).abs() + (self.z - other.z).abs()
     }
 }
-
 
 fn parse_input(input: String) -> Vec<Voxel> {
     let mut voxels = vec![];
@@ -153,9 +156,11 @@ pub fn run() {
     let voxels = parse_input(read_file("input/day18.txt"));
 
     let hidden_faces = count_hidden_faces(&voxels);
-    println!("It looks like the lava surface has {} units ", 6 * voxels.len() - 2 * hidden_faces);
+    println!(
+        "It looks like the lava surface has {} units ",
+        6 * voxels.len() - 2 * hidden_faces
+    );
 }
-
 
 pub fn run2() {
     let mut voxels = parse_input(read_file("input/day18.txt"));
@@ -171,7 +176,6 @@ pub fn run2() {
     let min_z = voxels.iter().map(|voxel| voxel.z).min().unwrap() - 1;
     let max_z = voxels.iter().map(|voxel| voxel.z).max().unwrap() + 1;
     let depth = max_z - min_z + 1;
-
 
     let mut space = Space::new(min_x, min_y, min_z, width, height, depth);
     for voxel in &voxels {
@@ -191,7 +195,10 @@ pub fn run2() {
         }
     }
     let hidden_faces = count_hidden_faces(&voxels);
-    println!("An this is the size of the exterior area: {} units", 6 * voxels.len() - 2 * hidden_faces);
+    println!(
+        "An this is the size of the exterior area: {} units",
+        6 * voxels.len() - 2 * hidden_faces
+    );
 }
 
 fn floodfill(space: &mut Space, x: i32, y: i32, z: i32) {
@@ -200,7 +207,14 @@ fn floodfill(space: &mut Space, x: i32, y: i32, z: i32) {
     }
     space.set_is_outside(x, y, z, true);
     space.set_visited(x, y, z, true);
-    for i in [(0, 1, 0), (0, -1, 0), (-1, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, -1)] {
+    for i in [
+        (0, 1, 0),
+        (0, -1, 0),
+        (-1, 0, 0),
+        (1, 0, 0),
+        (0, 0, 1),
+        (0, 0, -1),
+    ] {
         match space.get_visited(x + i.0, y + i.1, z + i.2) {
             None => {}
             Some(visited) => {
