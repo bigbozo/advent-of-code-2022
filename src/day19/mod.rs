@@ -14,6 +14,7 @@ enum Material {
 
 type RobotType = Vec<Material>;
 
+#[derive(Debug)]
 struct Blueprint {
     ore_robot: RobotType,
     clay_robot: RobotType,
@@ -63,14 +64,15 @@ pub fn run() {
         items.insert(Obsidian(1), 0);
         items.insert(Geode(1), 0);
 
-        println!("SCore for Blueprint: {}",run_simulation(&blueprint, &mut items, &mut robots, 24));
+        println!("SCore for Blueprint: {}", run_simulation(&blueprint, &mut items, &mut robots, 24));
     }
 }
 
 fn run_simulation(blueprint: &Blueprint, items: &mut HashMap<Material, u32>, robots: &mut Vec<Robot>, steps: i32) -> u32 {
-    if steps==0 {
+    if steps == 0 {
         return 0;
     }
+
     let mut max_score = 0;
     // collect
     {
@@ -79,83 +81,103 @@ fn run_simulation(blueprint: &Blueprint, items: &mut HashMap<Material, u32>, rob
                 Ore(amount) => { items.entry(Ore(1)).and_modify(|count| *count += amount); }
                 Clay(amount) => { items.entry(Clay(1)).and_modify(|count| *count += amount); }
                 Obsidian(amount) => { items.entry(Obsidian(1)).and_modify(|count| *count += amount); }
-                Geode(amount) => { items.entry(Geode(1)).and_modify(|count| *count += amount); }
+                Geode(amount) => { items.entry(Geode(1)).and_modify(|count|
+                    *count += amount); }
             }
         }
     }
     // 0. build nothing
-    max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
-    // 1. try building ore
-    match build_robot(&blueprint.ore_robot, items) {
-        None => {}
-        Some(robot) => {
-            robots.push(robot);
+
+    if steps>1 {
+        max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
+        // 1. try building ore
+        if is_material_sufficient(&blueprint.ore_robot, items) {
+            build_robot(&blueprint.ore_robot, items);
+            robots.push(Robot { produces: Ore(1) });
             max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
+            robots.pop();
             unbuild_robot(&blueprint.ore_robot, items);
+        }
+        // 2. try building clay
+        if is_material_sufficient(&blueprint.clay_robot, items) {
+            robots.push(Robot { produces: Clay(1) });
+            build_robot(&blueprint.clay_robot, items);
+            max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
+            unbuild_robot(&blueprint.clay_robot, items);
             robots.pop();
         }
-    }
-    // 2. try building clay
-    match build_robot(&blueprint.clay_robot, items) {
-        None => {}
-        Some(robot) => {
-            robots.push(robot);
+
+        // 3. try building obsidian
+        if is_material_sufficient(&blueprint.obsidian_robot, items) {
+            build_robot(&blueprint.obsidian_robot, items);
+            robots.push(Robot { produces: Obsidian(1) });
             max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
-            unbuild_robot(&blueprint.ore_robot, items);
+            unbuild_robot(&blueprint.obsidian_robot, items);
+            robots.pop();
+        }
+
+        // 4. try building geode
+        if is_material_sufficient(&blueprint.geode_robot, items) {
+            robots.push(Robot { produces: Geode(1) });
+            build_robot(&blueprint.geode_robot, items);
+            max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
+            unbuild_robot(&blueprint.geode_robot, items);
             robots.pop();
         }
     }
 
-    // 3. try building obsidian
-    match build_robot(&blueprint.obsidian_robot, items) {
-        None => {}
-        Some(robot) => {
-            robots.push(robot);
-            max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
-            unbuild_robot(&blueprint.ore_robot, items);
-            robots.pop();
-        }
-    }
 
-    // 4. try building geode
-    match build_robot(&blueprint.geode_robot, items) {
-        None => {}
-        Some(robot) => {
-            robots.push(robot);
-            max_score = max(max_score, run_simulation(blueprint, items, robots, steps - 1));
-            unbuild_robot(&blueprint.ore_robot, items);
-            robots.pop();
+    let result = match items.get(&Geode(1)) {
+        Some(amount) => {
+            if *amount > max_score && steps>3 {
+                println!("new highscore {} /  {}", steps, *amount);
+            }
+            max(max_score, *amount)
         }
-    }
-
-    return match items.get(&Geode(1)) {
-        Some(amount) => max(max_score,*amount),
         None => 0
+    };
+
+    // uncollect
+    {
+        for robot in robots.iter() {
+            match robot.produces {
+                Ore(amount) => { items.entry(Ore(1)).and_modify(|count|
+                    *count -= amount); }
+                Clay(amount) => { items.entry(Clay(1)).and_modify(|count|
+                    *count -= amount); }
+                Obsidian(amount) => { items.entry(Obsidian(1)).and_modify(|count|
+                    *count -= amount); }
+                Geode(amount) => { items.entry(Geode(1)).and_modify(|count|
+                    *count -= amount); }
+            }
+        }
     }
+
+    result
 }
 
-fn build_robot(blueprint: &Vec<Material>, items: &mut HashMap<Material, u32>) -> Option<Robot> {
+fn build_robot(blueprint: &Vec<Material>, items: &mut HashMap<Material, u32>) -> bool {
     // use material and return robot
     if is_material_sufficient(blueprint, items) {
         for material in blueprint {
             match material {
                 Ore(amount) => {
-                    items.entry(Ore(1)).and_modify(|a| *a-=amount);
+                    items.entry(Ore(1)).and_modify(|a| *a -= amount);
                 }
                 Clay(amount) => {
-                    items.entry(Clay(1)).and_modify(|a| *a-=amount);
+                    items.entry(Clay(1)).and_modify(|a| *a -= amount);
                 }
                 Obsidian(amount) => {
-                    items.entry(Obsidian(1)).and_modify(|a| *a-=amount);
+                    items.entry(Obsidian(1)).and_modify(|a| *a -= amount);
                 }
                 Geode(amount) => {
-                    items.entry(Geode(1)).and_modify(|a| *a-=amount);
+                    items.entry(Geode(1)).and_modify(|a| *a -= amount);
                 }
             }
         }
-
+        return true;
     }
-    None
+    false
 }
 
 fn is_material_sufficient(blueprint: &Vec<Material>, items: &mut HashMap<Material, u32>) -> bool {
@@ -210,16 +232,16 @@ fn unbuild_robot(blueprint: &Vec<Material>, items: &mut HashMap<Material, u32>) 
     for material in blueprint {
         match material {
             Ore(amount) => {
-                items.entry(Ore(1)).and_modify(|a| *a+=amount);
+                items.entry(Ore(1)).and_modify(|a| *a += amount);
             }
             Clay(amount) => {
-                items.entry(Clay(1)).and_modify(|a| *a+=amount);
+                items.entry(Clay(1)).and_modify(|a| *a += amount);
             }
             Obsidian(amount) => {
-                items.entry(Obsidian(1)).and_modify(|a| *a+=amount);
+                items.entry(Obsidian(1)).and_modify(|a| *a += amount);
             }
             Geode(amount) => {
-                items.entry(Geode(1)).and_modify(|a| *a+=amount);
+                items.entry(Geode(1)).and_modify(|a| *a += amount);
             }
         }
     }
