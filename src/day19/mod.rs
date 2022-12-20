@@ -6,6 +6,7 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Clone)]
 struct GameState {
+    blueprint_id: u32,
     // built robots
     ore_robots: u32,
     clay_robots: u32,
@@ -41,6 +42,7 @@ impl Display for GameState {
 
 impl GameState {
     pub fn new(
+        blueprint_id: u32,
         ore_cost: u32,
         clay_cost: u32,
         obsidian_ore_cost: u32,
@@ -49,6 +51,7 @@ impl GameState {
         geode_obsidian_cost: u32,
     ) -> GameState {
         GameState {
+            blueprint_id,
             ore_robots: 1,
             clay_robots: 0,
             obsidian_robots: 0,
@@ -98,7 +101,7 @@ fn parse_input(input: String) -> Vec<GameState> {
 }
 
 fn parse_line(line: &str) -> GameState {
-    let regex = Regex::new(r"Blueprint \d+: Each ore robot costs (\d+) ore. Each clay robot costs (\d+) ore. Each obsidian robot costs (\d+) ore and (\d+) clay. Each geode robot costs (\d+) ore and (\d+) obsidian.").unwrap();
+    let regex = Regex::new(r"Blueprint (\d+): Each ore robot costs (\d+) ore. Each clay robot costs (\d+) ore. Each obsidian robot costs (\d+) ore and (\d+) clay. Each geode robot costs (\d+) ore and (\d+) obsidian.").unwrap();
 
     let cap: Captures = regex.captures(line).unwrap();
 
@@ -109,6 +112,7 @@ fn parse_line(line: &str) -> GameState {
         cap[4].parse().unwrap(),
         cap[5].parse().unwrap(),
         cap[6].parse().unwrap(),
+        cap[7].parse().unwrap(),
     )
 }
 
@@ -205,14 +209,13 @@ pub fn run() {
     let game_states = parse_input(read_file("input/day19.txt"));
     let final_score = game_states
         .par_iter()
-        .enumerate()
-        .map(|(id, game_state)| {
-            println!("Start Blueprint {}", id);
+        .map(|game_state| {
+            println!("Start Blueprint {}", game_state.blueprint_id);
             let mut gs = game_state.clone();
             let score = run_simulation(&mut gs, 24);
-            println!("Score for Blueprint {}: {}", id, score);
+            println!("Score for Blueprint {}: {}", game_state.blueprint_id, score);
 
-            score * (id as u32 + 1)
+            score * game_state.blueprint_id
         })
         .sum::<u32>();
 
