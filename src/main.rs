@@ -1,6 +1,5 @@
-use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, day18, print_headline};
+use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, print_headline};
 use clap::Parser;
-use adventofcode::day14::run;
 
 #[derive(Parser)]
 struct Cli {
@@ -17,7 +16,7 @@ fn main() {
 fn run_day(day: Option<u32>, run_all: bool) {
     match day {
         None => {
-            for i in 1..19 {
+            for i in 1..20 {
                 if i!=16 {
                     run_day(Some(i),true);
                 } else {
@@ -119,9 +118,14 @@ fn run_day(day: Option<u32>, run_all: bool) {
             }
         }
         Some(18) => {
-            print_headline("Day 18 -         Boiling Boulders");
+            print_headline("Day 18 -        Boiling Boulders");
             day18::run();
             day18::run2();
+        }
+        Some(19) => {
+            print_headline("Day 19 -     Not Enough Minerals");
+            day19::run();
+            day19::run2();
         }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
