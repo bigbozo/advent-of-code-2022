@@ -115,22 +115,15 @@ fn parse_line(line: &str) -> GameState {
 fn run_simulation(
     game_state: &mut GameState,
     steps: i32,
-    messages: &mut Vec<String>,
-) -> (u32, Vec<String>) {
-    if steps == 0 {
-        return (0, vec![]);
+) -> u32 {
+    if steps < 0 {
+        return 0;
     }
-
-    let mut best_steps: Vec<String> = vec![];
-    let mut best_step = format!("{} - init",steps);
-
-    // collect
 
     let mut max_score = 0;
 
-
     // 4. try building geode
-    if steps > 1
+    if steps > 0
         && game_state.ores >= game_state.geode_ore_cost
         && game_state.obsidians >= game_state.geode_obsidian_cost
     {
@@ -138,10 +131,8 @@ fn run_simulation(
         game_state.obsidians -= game_state.geode_obsidian_cost;
         game_state.collect_materials();
         game_state.geode_robots += 1;
-        let (score, done_steps) = run_simulation(game_state, steps - 1, messages);
+        let score = run_simulation(game_state, steps - 1);
         if score > max_score {
-            best_steps = done_steps;
-            best_step = format!("{}: G [{}]", steps, game_state);
             max_score = score;
         }
         game_state.geode_robots -= 1;
@@ -149,7 +140,7 @@ fn run_simulation(
         game_state.ores += game_state.geode_ore_cost;
         game_state.obsidians += game_state.geode_obsidian_cost;
     } else {
-        if steps > 2 && game_state.obsidian_robots < game_state.max_obsidian_robots
+        if steps > 1 && game_state.obsidian_robots < game_state.max_obsidian_robots
             && game_state.ores >= game_state.obsidian_ore_cost
             && game_state.clays >= game_state.obsidian_clay_cost
         {
@@ -157,10 +148,8 @@ fn run_simulation(
             game_state.clays -= game_state.obsidian_clay_cost;
             game_state.collect_materials();
             game_state.obsidian_robots += 1;
-            let (score, done_steps) = run_simulation(game_state, steps - 1, messages);
+            let score = run_simulation(game_state, steps - 1);
             if score > max_score {
-                best_steps = done_steps;
-                best_step = format!("{}: O [{}]", steps, game_state);
                 max_score = score;
             }
             game_state.obsidian_robots -= 1;
@@ -170,15 +159,13 @@ fn run_simulation(
         }
 
         // 2. try building clay
-        if steps > 3 && game_state.clay_robots < game_state.max_clay_robots
+        if steps > 2 && game_state.clay_robots < game_state.max_clay_robots
             && game_state.ores >= game_state.clay_cost {
             game_state.ores -= game_state.clay_cost;
             game_state.collect_materials();
             game_state.clay_robots += 1;
-            let (score, done_steps) = run_simulation(game_state, steps - 1, messages);
+            let score = run_simulation(game_state, steps - 1);
             if score > max_score {
-                best_steps = done_steps;
-                best_step = format!("{}: C [{}]", steps, game_state);
                 max_score = score;
             }
             game_state.clay_robots -= 1;
@@ -187,15 +174,13 @@ fn run_simulation(
         }
 
         // 1. try building ore
-        if steps > 2 && game_state.ore_robots < game_state.max_ore_robots
+        if steps > 1 && game_state.ore_robots < game_state.max_ore_robots
             && game_state.ores >= game_state.ore_cost {
             game_state.ores -= game_state.ore_cost;
             game_state.collect_materials();
             game_state.ore_robots += 1;
-            let (score, done_steps) = run_simulation(game_state, steps - 1, messages);
+            let score = run_simulation(game_state, steps - 1);
             if score > max_score {
-                best_steps = done_steps;
-                best_step = format!("{}: I [{}]", steps, game_state);
                 max_score = score;
             }
             game_state.ore_robots -= 1;
@@ -205,38 +190,27 @@ fn run_simulation(
 
         if steps > 0 {
             game_state.collect_materials();
-            let (score, done_steps) = run_simulation(game_state, steps - 1, messages);
+            let score = run_simulation(game_state, steps - 1);
             game_state.uncollect_materials();
             if score > max_score {
-                best_steps = done_steps;
-                best_step = format!("{}: - [{}]", steps, game_state);
                 max_score = score;
             }
         }
     }
 
-    best_steps.push(best_step);
-
-
-
-    (max(max_score, game_state.geodes), best_steps)
+    max(max_score, game_state.geodes)
 }
 
 pub fn run() {
-    let game_states = parse_input(read_file("input/day19-test.txt"));
+    let game_states = parse_input(read_file("input/day19.txt"));
     let final_score = game_states
         .par_iter()
         .enumerate()
         .map(|(id, game_state)| {
             println!("Start Blueprint {}", id);
-            let mut messages = vec![];
             let mut gs = game_state.clone();
-            let (score, done_steps) = run_simulation(&mut gs, 25, &mut messages);
+            let score = run_simulation(&mut gs, 24);
             println!("Score for Blueprint {}: {}", id, score);
-            for line in done_steps.iter().rev() {
-                println!("{}", line);
-            }
-
 
             score * (id as u32 + 1)
         })
