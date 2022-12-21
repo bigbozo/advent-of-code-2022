@@ -254,7 +254,7 @@ fn run_simulation(
 }
 
 pub fn run() {
-    let game_states = parse_input(read_file("input/day19-test.txt"));
+    let game_states = parse_input(read_file("input/day19.txt"));
     let final_score = game_states
         .par_iter()
         .map(|game_state| {
