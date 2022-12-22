@@ -4,14 +4,16 @@ use regex::{Captures, Regex};
 use std::cmp::{max};
 use std::fmt::{Display, Formatter};
 
-#[derive(Clone)]
+#[derive(Debug,Clone)]
 struct GameState {
     blueprint_id: u32,
+
     // built robots
     ore_robots: u32,
     clay_robots: u32,
     obsidian_robots: u32,
     geode_robots: u32,
+
     // blueprint_costs
     ore_cost: u32,
     clay_cost: u32,
@@ -19,11 +21,14 @@ struct GameState {
     obsidian_clay_cost: u32,
     geode_ore_cost: u32,
     geode_obsidian_cost: u32,
+
     // harvested items
     ores: u32,
     clays: u32,
     obsidians: u32,
     geodes: u32,
+
+    // limits for robots as we can only build 1 at a time
     max_ore_robots: u32,
     max_clay_robots: u32,
     max_obsidian_robots: u32,
@@ -69,7 +74,7 @@ impl GameState {
             obsidians: 0,
             geodes: 0,
 
-            max_ore_robots: max(max(ore_cost, obsidian_ore_cost), geode_ore_cost),
+            max_ore_robots: max(max(ore_cost, max(clay_cost,obsidian_ore_cost)), geode_ore_cost),
             max_clay_robots: obsidian_clay_cost,
             max_obsidian_robots: geode_obsidian_cost,
         }
@@ -108,9 +113,6 @@ impl GameState {
         ))
     }
     pub fn time_to_clay(&self) -> Option<u32> {
-        if self.ores >= self.clay_cost {
-            return Some(1);
-        }
         self.time_to(self.clay_cost, self.ores, self.ore_robots)
     }
     pub fn time_to_ore(&self) -> Option<u32> {
@@ -119,14 +121,14 @@ impl GameState {
 
     pub fn time_to(&self, need: u32, have: u32, multi: u32) -> Option<u32> {
         if have >= need {
-            return Some(1);
+            return Some(0);
         }
         let missing = need - have;
         let mut time = missing / multi;
         if missing % multi > 0 {
             time += 1;
         }
-        Some(time + 1)
+        Some(time)
     }
 }
 
@@ -139,7 +141,6 @@ fn parse_input(input: String) -> Vec<GameState> {
 
     game_state
 }
-
 fn parse_line(line: &str) -> GameState {
     let regex = Regex::new(r"Blueprint (\d+): Each ore robot costs (\d+) ore. Each clay robot costs (\d+) ore. Each obsidian robot costs (\d+) ore and (\d+) clay. Each geode robot costs (\d+) ore and (\d+) obsidian.").unwrap();
 
@@ -163,7 +164,7 @@ fn run_simulation(
     let mut max_score: u32 = 0;
 
     // 1. do nothing
-    max_score = max(max_score, (steps + 1) * game_state.geode_robots);
+    max_score = max(max_score, steps  * game_state.geode_robots + game_state.geodes);
     let mut my_move: Vec<char> = vec!['!'];
 
 
@@ -171,12 +172,12 @@ fn run_simulation(
     match game_state.time_to_geode() {
         None => {}
         Some(time) => {
-            if time <= steps {
-                game_state.collect_materials(time);
+            if time < steps {
+                game_state.collect_materials(time + 1);
                 game_state.ores -= game_state.geode_ore_cost;
                 game_state.obsidians -= game_state.geode_obsidian_cost;
                 game_state.geode_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time);
+                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
                     my_move = sub_move;
@@ -185,19 +186,19 @@ fn run_simulation(
                 game_state.geode_robots -= 1;
                 game_state.ores += game_state.geode_ore_cost;
                 game_state.obsidians += game_state.geode_obsidian_cost;
-                game_state.uncollect_materials(time);
+                game_state.uncollect_materials(time + 1);
             }
         }
     }
     match game_state.time_to_obsidian() {
         None => {}
         Some(time) => {
-            if time <= steps && game_state.obsidian_robots < game_state.max_obsidian_robots {
-                game_state.collect_materials(time);
+            if time < steps && game_state.obsidian_robots < game_state.max_obsidian_robots {
+                game_state.collect_materials(time + 1);
                 game_state.ores -= game_state.obsidian_ore_cost;
                 game_state.clays -= game_state.obsidian_clay_cost;
                 game_state.obsidian_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time);
+                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
                     my_move = sub_move;
@@ -206,18 +207,18 @@ fn run_simulation(
                 game_state.obsidian_robots -= 1;
                 game_state.ores += game_state.obsidian_ore_cost;
                 game_state.clays += game_state.obsidian_clay_cost;
-                game_state.uncollect_materials(time);
+                game_state.uncollect_materials(time + 1);
             }
         }
     }
     match game_state.time_to_clay() {
         None => {}
         Some(time) => {
-            if time <= steps && game_state.clay_robots < game_state.max_clay_robots {
-                game_state.collect_materials(time);
+            if time < steps && game_state.clay_robots < game_state.max_clay_robots {
+                game_state.collect_materials(time + 1);
                 game_state.ores -= game_state.clay_cost;
                 game_state.clay_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time);
+                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
                     my_move = sub_move;
@@ -225,18 +226,18 @@ fn run_simulation(
                 }
                 game_state.clay_robots -= 1;
                 game_state.ores += game_state.clay_cost;
-                game_state.uncollect_materials(time);
+                game_state.uncollect_materials(time + 1);
             }
         }
     }
     match game_state.time_to_ore() {
         None => {}
         Some(time) => {
-            if time <= steps && game_state.ore_robots < game_state.max_ore_robots {
-                game_state.collect_materials(time);
+            if time < steps && game_state.ore_robots < game_state.max_ore_robots {
+                game_state.collect_materials(time + 1);
                 game_state.ores -= game_state.ore_cost;
                 game_state.ore_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time);
+                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
                     my_move = sub_move;
@@ -244,13 +245,13 @@ fn run_simulation(
                 }
                 game_state.ore_robots -= 1;
                 game_state.ores += game_state.ore_cost;
-                game_state.uncollect_materials(time);
+                game_state.uncollect_materials(time + 1);
             }
         }
     }
 
 
-    (max(max_score, game_state.geodes), my_move)
+    (max_score, my_move)
 }
 
 pub fn run() {
@@ -258,11 +259,11 @@ pub fn run() {
     let final_score = game_states
         .par_iter()
         .map(|game_state| {
-            println!("Start Blueprint {}", game_state.blueprint_id);
+            //println!("Start Blueprint {}", game_state.blueprint_id);
             let mut gs = game_state.clone();
             let (score, sub_move) = run_simulation(&mut gs, 24);
-            println!("Score for Blueprint {}: {}", game_state.blueprint_id, score);
-            println!("Path for Blueprint {}: {}", game_state.blueprint_id, sub_move.iter().rev().collect::<String>());
+            //println!("Score for Blueprint {}: {}", game_state.blueprint_id, score);
+            //println!("Path for Blueprint {}: {}", game_state.blueprint_id, sub_move.iter().rev().collect::<String>());
             score * game_state.blueprint_id
         })
         .sum::<u32>();
@@ -271,7 +272,20 @@ pub fn run() {
 }
 
 pub fn run2() {
-    todo!()
+    let game_states = parse_input(read_file("input/day19.txt"));
+    let final_score = game_states[0..3]
+        .par_iter()
+        .map(|game_state| {
+            //println!("Start Blueprint {}", game_state.blueprint_id);
+            let mut gs = game_state.clone();
+            let (score, sub_move) = run_simulation(&mut gs, 32);
+            println!("Score for Blueprint {}: {}", game_state.blueprint_id, score);
+            //println!("Path for Blueprint {}: {}", game_state.blueprint_id, sub_move.iter().rev().collect::<String>());
+            score
+        })
+        .product::<u32>();
+
+    println!("Final score: {}", final_score);
 }
 
 #[cfg(test)]
