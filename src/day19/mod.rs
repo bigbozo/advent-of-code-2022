@@ -160,12 +160,11 @@ fn parse_line(line: &str) -> GameState {
 fn run_simulation(
     game_state: &mut GameState,
     steps: u32,
-) -> (u32, Vec<char>) {
+) -> u32 {
     let mut max_score: u32 = 0;
 
     // 1. do nothing
     max_score = max(max_score, steps  * game_state.geode_robots + game_state.geodes);
-    let mut my_move: Vec<char> = vec!['!'];
 
 
     // 2. try building geode
@@ -177,11 +176,10 @@ fn run_simulation(
                 game_state.ores -= game_state.geode_ore_cost;
                 game_state.obsidians -= game_state.geode_obsidian_cost;
                 game_state.geode_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
+                let score= run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
-                    my_move = sub_move;
-                    my_move.push('G');
+
                 }
                 game_state.geode_robots -= 1;
                 game_state.ores += game_state.geode_ore_cost;
@@ -198,11 +196,10 @@ fn run_simulation(
                 game_state.ores -= game_state.obsidian_ore_cost;
                 game_state.clays -= game_state.obsidian_clay_cost;
                 game_state.obsidian_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
+                let score= run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
-                    my_move = sub_move;
-                    my_move.push('O');
+
                 }
                 game_state.obsidian_robots -= 1;
                 game_state.ores += game_state.obsidian_ore_cost;
@@ -218,11 +215,10 @@ fn run_simulation(
                 game_state.collect_materials(time + 1);
                 game_state.ores -= game_state.clay_cost;
                 game_state.clay_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
+                let score= run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
-                    my_move = sub_move;
-                    my_move.push('C');
+
                 }
                 game_state.clay_robots -= 1;
                 game_state.ores += game_state.clay_cost;
@@ -237,11 +233,10 @@ fn run_simulation(
                 game_state.collect_materials(time + 1);
                 game_state.ores -= game_state.ore_cost;
                 game_state.ore_robots += 1;
-                let (score, sub_move) = run_simulation(game_state, steps - time - 1);
+                let score= run_simulation(game_state, steps - time - 1);
                 if score > max_score {
                     max_score = score;
-                    my_move = sub_move;
-                    my_move.push('R');
+
                 }
                 game_state.ore_robots -= 1;
                 game_state.ores += game_state.ore_cost;
@@ -251,7 +246,7 @@ fn run_simulation(
     }
 
 
-    (max_score, my_move)
+    max_score
 }
 
 pub fn run() {
@@ -259,11 +254,8 @@ pub fn run() {
     let final_score = game_states
         .par_iter()
         .map(|game_state| {
-            //println!("Start Blueprint {}", game_state.blueprint_id);
             let mut gs = game_state.clone();
-            let (score, sub_move) = run_simulation(&mut gs, 24);
-            //println!("Score for Blueprint {}: {}", game_state.blueprint_id, score);
-            //println!("Path for Blueprint {}: {}", game_state.blueprint_id, sub_move.iter().rev().collect::<String>());
+            let score = run_simulation(&mut gs, 24);
             score * game_state.blueprint_id
         })
         .sum::<u32>();
@@ -276,11 +268,8 @@ pub fn run2() {
     let final_score = game_states[0..3]
         .par_iter()
         .map(|game_state| {
-            //println!("Start Blueprint {}", game_state.blueprint_id);
             let mut gs = game_state.clone();
-            let (score, sub_move) = run_simulation(&mut gs, 32);
-            println!("Score for Blueprint {}: {}", game_state.blueprint_id, score);
-            //println!("Path for Blueprint {}: {}", game_state.blueprint_id, sub_move.iter().rev().collect::<String>());
+            let score = run_simulation(&mut gs, 32);
             score
         })
         .product::<u32>();
