@@ -1,7 +1,4 @@
-use adventofcode::{
-    day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13,
-    day14, day15, day16, day17, day18, day19, print_headline,
-};
+use adventofcode::{day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, print_headline};
 use clap::Parser;
 
 #[derive(Parser)]
@@ -19,7 +16,7 @@ fn main() {
 fn run_day(day: Option<u32>, run_all: bool) {
     match day {
         None => {
-            for i in 1..20 {
+            for i in 1..22 {
                 if i != 16 {
                     run_day(Some(i), true);
                 } else {
@@ -129,6 +126,16 @@ fn run_day(day: Option<u32>, run_all: bool) {
             print_headline("Day 19 -     Not Enough Minerals");
             day19::run();
             day19::run2();
+        }
+        Some(20) => {
+            print_headline("Day 20 -Grove Positioning System");
+            day20::run();
+            day20::run2();
+        }
+        Some(21) => {
+            print_headline("Day 21 -             Monkey Math");
+            day21::run();
+            day21::run2();
         }
         _ => println!("Value [{}] for day is invalid", day.unwrap()),
     }
