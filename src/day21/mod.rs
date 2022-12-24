@@ -79,53 +79,7 @@ fn parse_input(input: &str) -> Vec<Monkey> {
     monkeys
 }
 
-fn parse_input2(input: &str) -> Vec<Monkey> {
-    let input = read_file(input);
-    let mut monkeys = vec![];
 
-    let regex = Regex::new(r"(\w+): ((\d+)|(\w+) (.) (\w+))").unwrap();
-
-    for line in input.lines() {
-        let cap = regex.captures(line).unwrap();
-        match cap.get(6) {
-            None => {
-                monkeys.push(Monkey {
-                    id: cap[1].to_string(),
-                    left: Value(cap[2].parse().unwrap()),
-                    right: Value(0),
-                    operator: Operator::Plus,
-                    remove: false,
-                });
-            }
-            Some(_) => {
-                monkeys.push(Monkey {
-                    id: cap[1].to_string(),
-                    left: match cap[4].parse() {
-                        Err(_) => Variable(cap[4].to_string()),
-                        Ok(v) => Operand::Value(v)
-                    },
-                    right: (match cap[6].parse() {
-                        Err(_) => Variable(cap[6].to_string()),
-                        Ok(v) => Operand::Value(v)
-                    }),
-                    operator: match &cap[5] {
-                        "+" => Operator::Plus,
-                        "-" => Operator::Minus,
-                        "*" => Operator::Multiply,
-                        "/" => Operator::Divide,
-                        _ => {
-                            println!("Unknown Operaotr: {}", &cap[5]);
-                            exit(1);
-                        }
-                    },
-                    remove: false,
-                });
-            }
-        }
-    }
-
-    monkeys
-}
 
 pub fn run() {
     let mut monkeys = parse_input("input/day21.txt");
@@ -247,82 +201,99 @@ pub fn run2() {
         let count = monkeys.len();
         monkeys.retain(|monkey| !monkey.remove);
         if count == monkeys.len() {
-            println!("Everything resolved upto me: {} monkeys in play", monkeys.len());
             break;
         }
     }
 
-    let humn_position = monkeys.iter().position(|monkey| monkey.id == "humn".to_string()).unwrap();
-    monkeys.remove(humn_position);
-    let base_monkeys = monkeys.clone();
+    let current_position = monkeys.iter().position(|monkey| monkey.id == "root".to_string()).unwrap();
+    let mut target;
+    let mut next_pos;
+    match &monkeys[current_position].left {
+        Value(v) => {
+            target = *v;
+            match &monkeys[current_position].right {
+                Value(_) => {
+                    unreachable!();
+                }
+                Variable(v) => {
+                    next_pos = (*v).clone();
+                }
+            }
+        }
+        Variable(v) => {
+            next_pos = (*v).clone();
+            match &monkeys[current_position].right {
+                Value(v) => {
+                    target = *v;
+                }
 
+                Variable(_) => {
+                    unreachable!();
+                }
+            }
+        }
+    }
 
-    let mut i = 0;
     loop {
-        if i % 1000 == 0 {
-            println!("This solution won't work; should be caclulated backwards");
-            println!("{}", i);
+        if next_pos == "humn".to_string() {
+            println!("You have to yell: {}",target);
             exit(1);
         }
-        // everything is calculated upto humn
-        monkeys = base_monkeys.clone();
-        value_map = HashMap::new();
-        value_map.insert("humn".to_string(), i);
-        'round: loop {
-            for monkey in &mut monkeys {
-                match &monkey.left {
-                    Variable(id) => match value_map.get(id) {
-                        Some(v) => {
-                            monkey.left = Operand::Value(*v);
-                        }
-                        _ => {}
-                    },
-                    Operand::Value(_) => {}
+        let current_position = monkeys.iter().position(|monkey| monkey.id == next_pos).unwrap();
+
+        let monkey: &Monkey = &monkeys[current_position];
+        match &monkey.left {
+            Value(v) => {
+                match &monkey.operator {
+                    Operator::Plus => {
+                        target -= v;
+                    }
+                    Operator::Minus => {
+                        target = v - target;
+                    }
+                    Operator::Multiply => {
+                        target /= v;
+                    }
+                    Operator::Divide => {
+                        target = v / target;
+                    }
+                    _ => {}
                 }
                 match &monkey.right {
-                    Variable(id) => match value_map.get(id) {
-                        Some(v) => {
-                            monkey.right = Operand::Value(*v);
-                        }
-                        _ => {}
-                    },
-                    Operand::Value(_) => {}
+                    Value(_) => {
+                        unreachable!();
+                    }
+                    Variable(v) => {
+                        next_pos = (*v).clone();
+                    }
                 }
-                match (&monkey.left, &monkey.right) {
-                    (Operand::Value(a), Operand::Value(b)) => {
-                        monkey.remove = true;
+            }
+            Variable(v) => {
+                next_pos = (*v).clone();
+                match &monkey.right {
+                    Value(v) => {
                         match &monkey.operator {
                             Operator::Plus => {
-                                value_map.insert(monkey.id.clone(), a + b);
+                                target -= v;
                             }
                             Operator::Minus => {
-                                value_map.insert(monkey.id.clone(), a - b);
+                                target += v;
                             }
                             Operator::Multiply => {
-                                value_map.insert(monkey.id.clone(), a * b);
+                                target /= v;
                             }
                             Operator::Divide => {
-                                value_map.insert(monkey.id.clone(), a / b);
+                                target *= v;
                             }
-                            Operator::Equal => {
-                                if a == b {
-                                    println!("You have to yell {}", i);
-                                    exit(1);
-                                }
-                                break 'round;
-                            }
-                            Operator::Player => {}
+                            _ => {}
                         }
                     }
-                    (_, _) => {}
+                    Variable(_) => {
+                        unreachable!();
+                    }
                 }
-            }
-            let count = monkeys.len();
-            monkeys.retain(|monkey| !monkey.remove);
-            if count == monkeys.len() {
-                panic!("Shouldn't happen");
+
             }
         }
-        i += 1;
     }
 }
